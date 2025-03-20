@@ -35,6 +35,17 @@ public class NamingService {
         }
     }
 
+    ///  Function to remove node (validate if node does not exist)
+    public void removeNode(String nodeName) {
+        int hashedName = mapHash(nodeName);
+        if (map.containsKey(hashedName)) {
+            map.remove(hashedName);
+            updateJSON();
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
+        }
+    }
+
     /// Function to write map to JSON
     public void updateJSON() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -45,7 +56,4 @@ public class NamingService {
             //
         }
     }
-
-
-
 }
