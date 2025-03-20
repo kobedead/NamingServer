@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Map;
 
 @SpringBootTest
 class NamingServiceTest {
@@ -18,4 +18,13 @@ class NamingServiceTest {
         namingService.addNode("adzadazd", "192.168.1.3");
     }
 
+
+    @Test
+    public void testReadNodes() {
+        Map<Integer, String> map = namingService.getMapFromJSON();
+        System.out.println("Keys");
+        map.keySet().forEach(System.out::println);
+        System.out.println("Values");
+        map.values().forEach(System.out::println);
+    }
 }

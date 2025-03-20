@@ -11,16 +11,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Math.abs;
-
 @Service
 public class NamingService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String FILE_PATH = "map.json";
     private Map<Integer, String> map = new HashMap<>();
 
-    /// Hashing function to hash incoming names (based on given hashing algorithm)
-
+    /**
+     * Hashing function to hash incoming names (based on given hashing algorithm)
+     * @param text name of the node or file to be hashed
+     * @return hashed integer value
+     */
     public int mapHash(String text) {
         int hashCode = text.hashCode();
         int max = Integer.MAX_VALUE;
@@ -33,9 +34,21 @@ public class NamingService {
         return (int) (((long) adjustedHash * 32768) / ((long) max - min));
     }
 
+    /**
+     * Returns the value associated with the node name
+     * @param nodename name of the node to fetch the IP from
+     * @return IP-address
+     */
+    public String getNode(String nodename) {
+        int hash = mapHash(nodename);
+        return map.get(hash);
+    }
 
-
-    /// Function to add new node (validate if node already exists)
+    /**
+     * Add node to the map and update the JSON if node does not exist
+     * @param nodeName name of the node to be added
+     * @param ip ip address of the node to be added
+     */
     public void addNode(String nodeName, String ip) {
         int hashedName = mapHash(nodeName);
         if (map.containsKey(hashedName)) {
@@ -46,8 +59,11 @@ public class NamingService {
         }
     }
 
-    ///  Function to remove node (validate if node does not exist)
-    public void removeNode(String nodeName) {
+    /**
+     * Removes node and update JSON if it is found in the map
+     * @param nodeName name of the node that will be removed
+     */
+    public void deleteNode(String nodeName) {
         int hashedName = mapHash(nodeName);
         if (map.containsKey(hashedName)) {
             map.remove(hashedName);
@@ -57,7 +73,9 @@ public class NamingService {
         }
     }
 
-    /// Function to write map to JSON
+    /**
+     * Update the JSON file with the current objects that are stored in memory in map
+     */
     public void updateJSON() {
         File file = new File(FILE_PATH);
         try {
@@ -75,6 +93,10 @@ public class NamingService {
         }
     }
 
+    /**
+     * Get all key value pairs contained in the Map.JSON file.
+     * @return all of the key value pairs from the JSON "database"
+     */
     public Map<Integer, String> getMapFromJSON() {
         File file = new File(FILE_PATH);  // Assuming FILE_PATH is defined as "map.json"
         try {
