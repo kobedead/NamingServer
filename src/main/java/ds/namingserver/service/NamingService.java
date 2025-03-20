@@ -56,4 +56,27 @@ public class NamingService {
             //
         }
     }
+
+    public File getFile(String filename){
+
+        String ip = getNodeFromFile(filename);
+
+
+
+        return null;
+    }
+
+
+    public String getNodeFromFile(String filename){
+
+        //get ip adress of node that should store file or have a file stored
+
+        return null;
+    }
+
+
+
+
+
+
 }
