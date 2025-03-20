@@ -4,6 +4,7 @@ import ds.namingserver.Model.AddNodeDTO;
 import ds.namingserver.service.NamingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -38,10 +40,9 @@ public class NamingController {
      */
     @GetMapping("/node/{name}")
     public String getNodeIP(@PathVariable String name) {
-        //String ip = namingservice.getNodeIP();
-        //logger.info("Called get Ip for node : " + name + "with ip : " + ip );
-        //return ip;
-        return null;
+        String ip = namingservice.getNode(name);
+        logger.info("Called get Ip for node : " + name + "with ip : " + ip );
+        return ip;
     }
 
 
@@ -51,7 +52,7 @@ public class NamingController {
      * @param addNodeDTO DTO with name and ip of node
      * @return the ResponseEntity with status 200 (OK)
      */
-    @PutMapping("/node")
+    @PostMapping("/node")
     public ResponseEntity<String> addNode(@RequestBody AddNodeDTO addNodeDTO) {
         namingservice.addNode(addNodeDTO.getName() , addNodeDTO.getIp());
         logger.info("Node added to Server, Name = "+ addNodeDTO.getName() + "Ip = "+addNodeDTO.getIp() );
@@ -66,7 +67,7 @@ public class NamingController {
      */
     @DeleteMapping("/node/{name}")
     public ResponseEntity<String> removeNode(@PathVariable String name) {
-        namingservice.removeNode(name);
+        namingservice.deleteNode(name);
         logger.info("Node removed from Server, Name = "+ name);
         return ResponseEntity.ok("Node removed successfully");
     }
@@ -79,25 +80,27 @@ public class NamingController {
      * @return the file
      */
     @GetMapping("/file/{filename}")
-    public ResponseEntity downloadFile(@PathVariable("filename") String filename) throws FileNotFoundException {
+    public ResponseEntity downloadFile(@PathVariable("filename") String filename) throws IOException {
 
         // Get file instance from the service
-        File file= namingservice.getFile(filename);
+        ResponseEntity<Resource> resource= namingservice.getFile(filename);
+        return resource;
 
-        // Creating a new InputStreamResource object
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+    }
 
-        // Creating a new instance of HttpHeaders Object
-        HttpHeaders headers = new HttpHeaders();
 
-        // Setting up values for contentType and headerValue
-        String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+    /**
+     * send file to correct node from name of file
+     *
+     * @param filename name of the file
+     * @return the file
+     */
+    @GetMapping("/file/{filename}")
+    public ResponseEntity uploadFile(@PathVariable("filename") String filename) throws IOException {
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
+        //needs a file as input probabily
+
+        return namingservice.sendFile(filename);
 
     }
 
