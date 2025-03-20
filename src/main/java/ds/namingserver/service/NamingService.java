@@ -20,14 +20,20 @@ public class NamingService {
     private Map<Integer, String> map = new HashMap<>();
 
     /// Hashing function to hash incoming names (based on given hashing algorithm)
-    public int mapHash(String name) {
-        int JAVA_HASH_MAX = Integer.MAX_VALUE;
-        int JAVA_HASH_MIN = Integer.MIN_VALUE;
-        int NEW_MAX = 32768;
 
-        int hashCode = name.hashCode();
-        return (int) (((long) (hashCode - JAVA_HASH_MIN) * NEW_MAX) / ((long) JAVA_HASH_MAX - JAVA_HASH_MIN));
+    public int mapHash(String text) {
+        int hashCode = text.hashCode();
+        int max = Integer.MAX_VALUE;
+        int min = Integer.MIN_VALUE;
+        
+        // Ensure the hashCode is always positive
+        int adjustedHash = Math.abs(hashCode);
+        
+        // Mapping hashCode from (Integer.MIN_VALUE, Integer.MAX_VALUE) to (0, 32768)
+        return (int) (((long) adjustedHash * 32768) / ((long) max - min));
     }
+
+
 
     /// Function to add new node (validate if node already exists)
     public void addNode(String nodeName, String ip) {
