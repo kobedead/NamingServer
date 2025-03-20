@@ -14,6 +14,8 @@ class NamingServiceTest {
     @Test
     public void testNamingService() {
         namingService.addNode("testNode1", "192.168.1.1");
+        namingService.addNode("node", "192.168.1.2");
+        namingService.addNode("adzadazd", "192.168.1.3");
     }
 
 }
