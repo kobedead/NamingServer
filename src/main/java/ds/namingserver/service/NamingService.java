@@ -6,15 +6,20 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,7 +106,7 @@ public class NamingService {
         }
     }
 
-    public ResponseEntity<Resource> getFile(String filename) throws IOException {
+    public ResponseEntity<Resource> getFile(String filename)  {
 
         String ip = getNodeFromName(filename);
 
@@ -116,35 +121,32 @@ public class NamingService {
         return response;
         }
 
-    public ResponseEntity<Resource> sendFile(String filename) throws IOException {
+    public ResponseEntity<String> sendFile(MultipartFile file)  {
 
-        // Checking whether the file requested for download exists or not
-        //String fileUploadpath = System.getProperty("user.dir") +"/Uploads";
-        //String[] filenames = this.getFiles();
-        //boolean contains = Arrays.asList(filenames).contains(filename);
-        //if(!contains) {
-        //    return new ResponseEntity("FIle Not Found",HttpStatus.NOT_FOUND);
-        //}
 
-        // Setting up the filepath
-        String filePath = "D:/schoolshit/6_DS/Lab3_node/NamingNote/yea";
+        String ip = getNodeFromName(file.getName());
 
-        // Creating new file instance
-        File file= new File(filePath);
-        // Creating a new InputStreamResource object
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        final String uri = "http://localhost:8082/node/file/";
 
-        // Creating a new instance of HttpHeaders Object
+        // Create headers for multipart form-data
         HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        // Setting up values for contentType and headerValue
-        String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+        // Create a MultiValueMap to hold the file data
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", file.getResource());  // Use the file's resource directly
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
+        // Create HttpEntity with body and headers
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        // Create a RestTemplate instance
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Send the HTTP POST request
+        ResponseEntity<String> response = restTemplate.exchange(
+                uri, HttpMethod.POST, entity, String.class);
+
+        return response;
 
     }
 
@@ -158,17 +160,22 @@ public class NamingService {
         int hashOfName = mapHash(filename);
         Map<Integer, String> nodeMap = getMapFromJSON();
 
-        int closest = nodeMap.keySet().iterator().next();
+
+        int closest = Collections.max(new ArrayList<>(nodeMap.keySet()))  ;
         int minDifference = Math.abs(hashOfName - closest);
 
 
         for (int num : nodeMap.keySet()) {
-            int difference = Math.abs(hashOfName - num);
-            if (difference < minDifference) {
-                closest = num;
-                minDifference = difference;
+            if (num < hashOfName) {
+
+                int difference = Math.abs(hashOfName - num);
+                if (difference < minDifference) {
+                    closest = num;
+                    minDifference = difference;
+                }
             }
         }
+
         return nodeMap.get(closest);
     }
 
