@@ -1,6 +1,8 @@
 package ds.namingserver.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import ds.namingserver.CustomMap.LocalJsonMap;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -14,10 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,9 +23,13 @@ import java.util.Map;
 
 @Service
 public class NamingService {
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String FILE_PATH = "map.json";
-    private Map<Integer, String> map = new HashMap<>();
+
+    private Map<Integer, String> map;
+
+    public NamingService(){
+        map = new LocalJsonMap<>( "map.json");
+    }
+
 
     /**
      * Hashing function to hash incoming names (based on given hashing algorithm)
@@ -67,8 +69,7 @@ public class NamingService {
         if (map.containsKey(hashedName)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This node already exists");
         } else {
-            map.put(mapHash(nodeName), ip);
-            updateJSON();
+            map.put(hashedName, ip);
         }
     }
 
@@ -80,31 +81,12 @@ public class NamingService {
         int hashedName = mapHash(nodeName);
         if (map.containsKey(hashedName)) {
             map.remove(hashedName);
-            updateJSON();
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
         }
     }
 
-    /**
-     * Update the JSON file with the current objects that are stored in memory in map
-     */
-    public void updateJSON() {
-        File file = new File(FILE_PATH);
-        try {
-            // Read existing data from JSON file if it exists and is not empty
-            Map<Integer, String> existingData = getMapFromJSON(); // Use the getMapFromJSON method
 
-            // Merge existing data with the new data in memory
-            existingData.putAll(map);
-
-            // Write updated data back to the file
-            objectMapper.writeValue(file, existingData);
-            System.out.println("Map updated and saved to map.json successfully!");
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error writing to JSON", e);
-        }
-    }
 
     public ResponseEntity<Resource> getFile(String filename)  {
 
@@ -153,19 +135,16 @@ public class NamingService {
 
 
 
-
-
     public String getNodeFromName(String filename){
 
         int hashOfName = mapHash(filename);
-        Map<Integer, String> nodeMap = getMapFromJSON();
 
 
-        int closest = Collections.max(new ArrayList<>(nodeMap.keySet()))  ;
+        int closest = Collections.max(new ArrayList<>(map.keySet()))  ;
         int minDifference = Math.abs(hashOfName - closest);
 
 
-        for (int num : nodeMap.keySet()) {
+        for (int num : map.keySet()) {
             if (num < hashOfName) {
 
                 int difference = Math.abs(hashOfName - num);
@@ -176,35 +155,11 @@ public class NamingService {
             }
         }
 
-        return nodeMap.get(closest);
+        return map.get(closest);
     }
 
 
-
-
-
-
-
-    /**
-     * Get all key value pairs contained in the Map.JSON file.
-     * @return all of the key value pairs from the JSON "database"
-     */
-    public Map<Integer, String> getMapFromJSON() {
-        File file = new File(FILE_PATH);  // Assuming FILE_PATH is defined as "map.json"
-        try {
-            // Check if the file exists and has content
-            if (file.exists() && file.length() > 0) {
-                // Read the content from the file and map it to a Map<Integer, String>
-                return objectMapper.readValue(file, new TypeReference<Map<Integer, String>>() {});
-            } else {
-                // Return an empty map if the file is empty or doesn't exist
-                return new HashMap<>();
-            }
-        } catch (IOException e) {
-            // Handle any IO exceptions (e.g., file read issues)
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error reading JSON file", e);
-        }
+    public Map<Integer, String> getMap() {
+        return map;
     }
-
-
 }
