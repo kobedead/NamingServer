@@ -1,18 +1,21 @@
 package ds.namingserver.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import ds.namingserver.CustomMap.LocalJsonMap;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,9 +23,13 @@ import java.util.Map;
 
 @Service
 public class NamingService {
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String FILE_PATH = "src/main/resources/map.json";
-    private Map<Integer, String> map = new HashMap<>();
+
+    private Map<Integer, String> map;
+
+    public NamingService(){
+        map = new LocalJsonMap<>( "map.json");
+    }
+
 
     /**
      * Hashing function to hash incoming names (based on given hashing algorithm)
@@ -48,12 +55,7 @@ public class NamingService {
      */
     public String getNode(String nodename) {
         int hash = mapHash(nodename);
-        String value = map.get(hash);
-        if (value != null) {
-            return value;
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node" + nodename + " was not found");
-        }
+        return map.get(hash);
     }
 
     /**
@@ -65,10 +67,9 @@ public class NamingService {
         int hashedName = mapHash(nodeName);
         System.out.println(hashedName);
         if (map.containsKey(hashedName)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A node with this name already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This node already exists");
         } else {
-            map.put(mapHash(nodeName), ip);
-            updateJSON();
+            map.put(hashedName, ip);
         }
     }
 
@@ -80,46 +81,18 @@ public class NamingService {
         int hashedName = mapHash(nodeName);
         if (map.containsKey(hashedName)) {
             map.remove(hashedName);
-            updateJSON();
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
         }
     }
 
-    /**
-     * Update the JSON file with the current objects that are stored in memory in map
-     */
-    public void updateJSON() {
-        File file = new File(FILE_PATH);
-        try {
-            // Read existing data from JSON file if it exists and is not empty
-            Map<Integer, String> existingData = getMapFromJSON(); // Use the getMapFromJSON method
 
-            // Merge existing data with the new data in memory
-            existingData.putAll(map);
-
-            // Write updated data back to the file
-            objectMapper.writeValue(file, existingData);
-            System.out.println("Map updated and saved to map.json successfully!");
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error writing to JSON", e);
-        }
-    }
-
-    /**
-     * Overwrites the current JSON file with a new map
-     * @param map new map to overwrite the JSON with
-     */
-    public void updateJSONFromMap(Map<Integer, String> map) {
-        this.map = map;
-        updateJSON();
-    }
 
     public ResponseEntity<Resource> getFile(String filename)  {
 
         String ip = getNodeFromName(filename);
 
-        final String uri = "http://localhost:8082/node/file/"+filename;
+        final String uri = "http://"+ip+":8082/node/file/"+filename;
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -135,7 +108,7 @@ public class NamingService {
 
         String ip = getNodeFromName(file.getName());
 
-        final String uri = "http://localhost:8082/node/file/";
+        final String uri = "http://"+ip+":8082/node/file/";
 
         // Create headers for multipart form-data
         HttpHeaders headers = new HttpHeaders();
@@ -162,19 +135,16 @@ public class NamingService {
 
 
 
-
-
     public String getNodeFromName(String filename){
 
         int hashOfName = mapHash(filename);
-        Map<Integer, String> nodeMap = getMapFromJSON();
 
 
-        int closest = Collections.max(new ArrayList<>(nodeMap.keySet()))  ;
+        int closest = Collections.max(new ArrayList<>(map.keySet()))  ;
         int minDifference = Math.abs(hashOfName - closest);
 
 
-        for (int num : nodeMap.keySet()) {
+        for (int num : map.keySet()) {
             if (num < hashOfName) {
 
                 int difference = Math.abs(hashOfName - num);
@@ -185,35 +155,11 @@ public class NamingService {
             }
         }
 
-        return nodeMap.get(closest);
+        return map.get(closest);
     }
 
 
-
-
-
-
-
-    /**
-     * Get all key value pairs contained in the Map.JSON file.
-     * @return all of the key value pairs from the JSON "database"
-     */
-    public Map<Integer, String> getMapFromJSON() {
-        File file = new File(FILE_PATH);  // Assuming FILE_PATH is defined as "map.json"
-        try {
-            // Check if the file exists and has content
-            if (file.exists() && file.length() > 0) {
-                // Read the content from the file and map it to a Map<Integer, String>
-                return objectMapper.readValue(file, new TypeReference<Map<Integer, String>>() {});
-            } else {
-                // Return an empty map if the file is empty or doesn't exist
-                return new HashMap<>();
-            }
-        } catch (IOException e) {
-            // Handle any IO exceptions (e.g., file read issues)
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error reading JSON file", e);
-        }
+    public Map<Integer, String> getMap() {
+        return map;
     }
-
-
 }
