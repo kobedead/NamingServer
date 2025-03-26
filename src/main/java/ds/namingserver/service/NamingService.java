@@ -1,20 +1,27 @@
 package ds.namingserver.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class NamingService {
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String FILE_PATH = "map.json";
+    private static final String FILE_PATH = "src/main/resources/map.json";
     private Map<Integer, String> map = new HashMap<>();
 
     /**
@@ -41,7 +48,12 @@ public class NamingService {
      */
     public String getNode(String nodename) {
         int hash = mapHash(nodename);
-        return map.get(hash);
+        String value = map.get(hash);
+        if (value != null) {
+            return value;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node" + nodename + " was not found");
+        }
     }
 
     /**
@@ -51,8 +63,9 @@ public class NamingService {
      */
     public void addNode(String nodeName, String ip) {
         int hashedName = mapHash(nodeName);
+        System.out.println(hashedName);
         if (map.containsKey(hashedName)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This node already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A node with this name already exists");
         } else {
             map.put(mapHash(nodeName), ip);
             updateJSON();
@@ -94,6 +107,93 @@ public class NamingService {
     }
 
     /**
+     * Overwrites the current JSON file with a new map
+     * @param map new map to overwrite the JSON with
+     */
+    public void updateJSONFromMap(Map<Integer, String> map) {
+        this.map = map;
+        updateJSON();
+    }
+
+
+    public ResponseEntity<Resource> getFile(String filename) throws IOException {
+
+        String ip = getNodeFromName(filename);
+
+        final String uri = "http://localhost:8082/node/file/"+filename;
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<Resource> response = restTemplate.exchange(
+                uri, HttpMethod.GET, null, Resource.class);
+
+        //return result;
+        return response;
+        }
+
+    public ResponseEntity<Resource> sendFile(String filename) throws IOException {
+
+        // Checking whether the file requested for download exists or not
+        //String fileUploadpath = System.getProperty("user.dir") +"/Uploads";
+        //String[] filenames = this.getFiles();
+        //boolean contains = Arrays.asList(filenames).contains(filename);
+        //if(!contains) {
+        //    return new ResponseEntity("FIle Not Found",HttpStatus.NOT_FOUND);
+        //}
+
+        // Setting up the filepath
+        String filePath = "D:/schoolshit/6_DS/Lab3_node/NamingNote/yea";
+
+        // Creating new file instance
+        File file= new File(filePath);
+        // Creating a new InputStreamResource object
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+        // Creating a new instance of HttpHeaders Object
+        HttpHeaders headers = new HttpHeaders();
+
+        // Setting up values for contentType and headerValue
+        String contentType = "application/octet-stream";
+        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                .body(resource);
+
+    }
+
+
+
+
+
+
+    public String getNodeFromName(String filename){
+
+        int hashOfName = mapHash(filename);
+        Map<Integer, String> nodeMap = getMapFromJSON();
+
+        int closest = nodeMap.keySet().iterator().next();
+        int minDifference = Math.abs(hashOfName - closest);
+
+
+        for (int num : nodeMap.keySet()) {
+            int difference = Math.abs(hashOfName - num);
+            if (difference < minDifference) {
+                closest = num;
+                minDifference = difference;
+            }
+        }
+        return nodeMap.get(closest);
+    }
+
+
+
+
+
+
+
+    /**
      * Get all key value pairs contained in the Map.JSON file.
      * @return all of the key value pairs from the JSON "database"
      */
@@ -113,5 +213,6 @@ public class NamingService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error reading JSON file", e);
         }
     }
+
 
 }
