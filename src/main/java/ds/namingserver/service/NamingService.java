@@ -92,7 +92,7 @@ public class NamingService {
 
         String ip = getNodeFromName(filename);
 
-        final String uri = "http://localhost:8082/node/file/"+filename;
+        final String uri = "http://"+ip+":8082/node/file/"+filename;
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -108,7 +108,7 @@ public class NamingService {
 
         String ip = getNodeFromName(file.getName());
 
-        final String uri = "http://localhost:8082/node/file/";
+        final String uri = "http://"+ip+":8082/node/file/";
 
         // Create headers for multipart form-data
         HttpHeaders headers = new HttpHeaders();
