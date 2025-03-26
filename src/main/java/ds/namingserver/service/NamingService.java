@@ -162,4 +162,8 @@ public class NamingService {
     public Map<Integer, String> getMap() {
         return map;
     }
+
+    public void setMap(Map<Integer, String> map) {
+        this.map = map;
+    }
 }
