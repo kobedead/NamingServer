@@ -105,7 +105,7 @@ public class NamingService {
     public ResponseEntity<String> sendFile(MultipartFile file)  {
 
 
-        String ip = getNodeFromName(file.getName());
+        String ip = getNodeFromName(file.getOriginalFilename());
 
         final String uri = "http://"+ip+":8082/node/file";
 
