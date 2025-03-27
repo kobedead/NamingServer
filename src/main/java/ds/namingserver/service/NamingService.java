@@ -1,24 +1,16 @@
 package ds.namingserver.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import ds.namingserver.CustomMap.LocalJsonMap;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -26,8 +18,10 @@ public class NamingService {
 
     private Map<Integer, String> map;
 
+    public final String MAP_PATH = "src/main/resources/map.json";
+
     public NamingService(){
-        map = new LocalJsonMap<>( "map.json");
+        map = new LocalJsonMap<>(MAP_PATH);
     }
 
 
@@ -55,7 +49,12 @@ public class NamingService {
      */
     public String getNode(String nodename) {
         int hash = mapHash(nodename);
-        return map.get(hash);
+        String value = map.get(hash);
+        if (value != null) {
+            return value;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node" + nodename + " was not found");
+        }
     }
 
     /**
@@ -166,4 +165,13 @@ public class NamingService {
     public void setMap(Map<Integer, String> map) {
         this.map = map;
     }
+
+
+
+
+
+
+
+
+
 }

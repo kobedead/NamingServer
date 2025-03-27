@@ -12,21 +12,20 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest
+@SpringBootTest(classes = NamingService.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)  // Allows non-static @AfterAll
 class NamingServiceTest {
 
     @Autowired
     private NamingService namingService;
 
-    private static final String JSON_FILE_PATH = "src/main/resources/map.json";
     private static final String JSON_FILE_PATH_BACKUP = "src/main/resources/map_backup.json";
 
 
     @BeforeEach
     void setUp() throws IOException {
         // Backup the original JSON file
-        Files.copy(Paths.get(JSON_FILE_PATH), Paths.get(JSON_FILE_PATH_BACKUP), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(Paths.get(namingService.MAP_PATH), Paths.get(JSON_FILE_PATH_BACKUP), StandardCopyOption.REPLACE_EXISTING);
 
         namingService.setMap(new LocalJsonMap<>(JSON_FILE_PATH_BACKUP));
 
@@ -36,11 +35,10 @@ class NamingServiceTest {
         //namingService.updateJSONFromMap(testData);
     }
 
+
+
     @AfterEach
     void tearDown() throws IOException {
-        // Restore the original JSON file
-        //Files.copy(Paths.get(JSON_FILE_PATH_BACKUP), Paths.get(JSON_FILE_PATH), StandardCopyOption.REPLACE_EXISTING);
-
         // Delete the backup file
         Files.deleteIfExists(Paths.get(JSON_FILE_PATH_BACKUP));
     }
@@ -74,5 +72,10 @@ class NamingServiceTest {
         // Alternative path
         // Remove a node that does not exist
         assertThrows(ResponseStatusException.class, () -> namingService.deleteNode("non-existant-node"));
+    }
+
+    @AfterAll
+    void restore(){
+        namingService.setMap(new LocalJsonMap<>(namingService.MAP_PATH));
     }
 }
