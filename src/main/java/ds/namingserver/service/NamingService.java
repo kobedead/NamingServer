@@ -138,6 +138,11 @@ public class NamingService {
 
         int hashOfName = mapHash(filename);
 
+        System.out.println(filename);
+        System.out.println(hashOfName);
+        System.out.println("hashes in map : ");
+        map.keySet().forEach(System.out::println);
+        System.out.println("end");
 
         int closest = Collections.max(new ArrayList<>(map.keySet()))  ;
         int minDifference = Math.abs(hashOfName - closest);
