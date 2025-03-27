@@ -107,7 +107,7 @@ public class NamingService {
 
         String ip = getNodeFromName(file.getName());
 
-        final String uri = "http://"+ip+":8082/node/file/";
+        final String uri = "http://"+ip+":8082/node/file";
 
         // Create headers for multipart form-data
         HttpHeaders headers = new HttpHeaders();
