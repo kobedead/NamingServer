@@ -145,19 +145,23 @@ public class NamingService {
         System.out.println("hashes in map : ");
         map.keySet().forEach(System.out::println);
 
-        int closest = Collections.max(new ArrayList<>(map.keySet()))  ;
-        int minDifference = Math.abs(hashOfName - closest);
 
+        Integer closest = null;
+        int minDifference = Integer.MAX_VALUE;
 
         for (int num : map.keySet()) {
-            if (num < hashOfName) {
-
-                int difference = Math.abs(hashOfName - num);
+            if (num < hashOfName) { // Ensure we only consider smaller values
+                int difference = hashOfName - num; // Difference should be positive
                 if (difference < minDifference) {
                     closest = num;
                     minDifference = difference;
                 }
             }
+        }
+
+        // If no smaller key found, get the largest key
+        if (closest == null) {
+            closest = Collections.max(map.keySet());
         }
 
 

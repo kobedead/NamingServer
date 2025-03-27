@@ -99,9 +99,6 @@ public class NamingController {
     @PostMapping("/file")
     public ResponseEntity uploadFile(@RequestBody MultipartFile file ) throws IOException {
 
-        System.out.println("yea");
-        System.out.println(file.getOriginalFilename());
-
         return namingservice.sendFile(file);
 
     }
