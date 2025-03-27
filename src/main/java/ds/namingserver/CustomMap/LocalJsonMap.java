@@ -44,14 +44,8 @@ public class LocalJsonMap<K, V> extends HashMap<K, V> {
     public void updateJSON() {
         File file = new File(FILE_PATH);
         try {
-            // Read existing data from JSON file if it exists and is not empty
-            Map<K, V> existingData = getMapFromJSON(); // Use the getMapFromJSON method
-
-            // Merge existing data with the new data in memory
-            existingData.putAll(this);
-
             // Write updated data back to the file
-            objectMapper.writeValue(file, existingData);
+            objectMapper.writeValue(file, this);
             System.out.println("Map updated and saved to map.json successfully!");
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error writing to JSON", e);
