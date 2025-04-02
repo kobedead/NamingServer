@@ -78,4 +78,9 @@ class NamingServiceTest {
     void restore(){
         namingService.setMap(new LocalJsonMap<>(namingService.MAP_PATH));
     }
+
+    @Test
+    void testNodeSize() {
+        namingService.processMulticast("localhost");
+    }
 }
