@@ -23,9 +23,10 @@ import java.util.logging.Logger;
 @RequestMapping("/namingserver")
 public class NamingController {
 
-    private final NamingService namingservice;
-
     Logger logger = Logger.getLogger(NamingController.class.getName());
+
+
+    private final NamingService namingservice;
 
     @Autowired
     public NamingController(NamingService namingservice) {

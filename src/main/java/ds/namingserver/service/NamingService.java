@@ -1,5 +1,6 @@
 package ds.namingserver.service;
 
+import ds.namingserver.Config.NSConf;
 import ds.namingserver.CustomMap.LocalJsonMap;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -91,7 +92,7 @@ public class NamingService {
 
         String ip = getNodeFromName(filename);
 
-        final String uri = "http://"+ip+":8082/node/file/"+filename;
+        final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file/"+filename;
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -107,7 +108,7 @@ public class NamingService {
 
         String ip = getNodeFromName(file.getOriginalFilename());
 
-        final String uri = "http://"+ip+":8082/node/file";
+        final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file";
 
         // Create headers for multipart form-data
         HttpHeaders headers = new HttpHeaders();
@@ -184,10 +185,18 @@ public class NamingService {
     }
 
 
-    public void processMulticast(String requestingNodeIp) {
+    public void processIncomingMulticast(String requestingNodeIp , String name) {
+
+        //calc hash
+        int hashName = mapHash(name);
+
+        //add node to map
+        map.put(hashName , requestingNodeIp);
+
+        //return number of nodes on network (in map)
         int numberOfNodes = map.size();
 
-        final String uri = "http://"+requestingNodeIp+":8082/node/size";
+        final String uri = "http://"+requestingNodeIp+":"+ NSConf.NAMINGNODE_PORT +"/node/size";
 
         // Set headers if necessary
         HttpHeaders headers = new HttpHeaders();
