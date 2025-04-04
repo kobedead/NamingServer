@@ -184,11 +184,24 @@ public class NamingService {
     }
 
 
+    public void processMulticast(String requestingNodeIp) {
+        int numberOfNodes = map.size();
 
+        final String uri = "http://"+requestingNodeIp+":8082/node/size";
 
+        // Set headers if necessary
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
 
+        // Wrap the integer in HttpEntity
+        HttpEntity<Integer> requestEntity = new HttpEntity<>(numberOfNodes, headers);
 
+        // Send request using exchange()
+        RestTemplate restTemplate = new RestTemplate();
 
+        ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
 
-
+        // Print response
+        System.out.println("Response: " + response.getBody());
+    }
 }
