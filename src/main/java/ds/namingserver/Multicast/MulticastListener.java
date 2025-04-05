@@ -3,24 +3,27 @@ package ds.namingserver.Multicast;
 
 import ds.namingserver.Config.NSConf;
 import ds.namingserver.service.NamingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MulticastListener implements Runnable {
+@Component
+public class MulticastListener  {
 
     private MulticastSocket socket;
     private InetAddress group;
 
-    private NamingService namingService;
+    private final NamingService namingService;
 
 
-    // Constructor
-    public MulticastListener() {
 
-        namingService = new NamingService();
+    public MulticastListener(NamingService namingService) {
+        this.namingService = namingService;
 
         try {
             // Create the multicast socket
@@ -40,7 +43,6 @@ public class MulticastListener implements Runnable {
         }
     }
 
-    @Override
     public void run() {
         byte[] buffer = new byte[1024];  // Buffer for receiving messages
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -102,13 +104,4 @@ public class MulticastListener implements Runnable {
         return null;
     }
 
-
-
-
-    public static void main(String[] args) {
-        // Create and start the listener thread
-        MulticastListener listener = new MulticastListener();
-        Thread listenerThread = new Thread(listener);
-        listenerThread.start();
-    }
 }

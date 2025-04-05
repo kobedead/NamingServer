@@ -2,6 +2,10 @@ package ds.namingserver.service;
 
 import ds.namingserver.Config.NSConf;
 import ds.namingserver.CustomMap.LocalJsonMap;
+import ds.namingserver.Multicast.MulticastListener;
+import jakarta.annotation.PostConstruct;
+import org.apache.catalina.core.StandardThreadExecutor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -13,6 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class NamingService {
@@ -21,10 +27,21 @@ public class NamingService {
 
     public final String MAP_PATH = "src/main/resources/map.json";
 
-    public NamingService(){
+    private final ExecutorService multicastExecutor;
+    private MulticastListener multicastListener;
+
+    public NamingService()
+    {
         map = new LocalJsonMap<>(MAP_PATH);
+        this.multicastListener = new MulticastListener(this);
+        this.multicastExecutor = Executors.newSingleThreadExecutor();
+
     }
 
+    @PostConstruct
+    public void startMulticastListener() {
+        multicastExecutor.submit(multicastListener::run);
+    }
 
     /**
      * Hashing function to hash incoming names (based on given hashing algorithm)
@@ -187,6 +204,8 @@ public class NamingService {
 
     public void processIncomingMulticast(String requestingNodeIp , String name) {
 
+        System.out.println("Got the incoming multicast" + requestingNodeIp);
+
         //calc hash
         int hashName = mapHash(name);
 
@@ -196,7 +215,9 @@ public class NamingService {
         //return number of nodes on network (in map)
         int numberOfNodes = map.size();
 
-        final String uri = "http://"+requestingNodeIp+":"+ NSConf.NAMINGNODE_PORT +"/node/size";
+        System.out.println("number of nodes : " + numberOfNodes);
+
+        final String uri = "http://"+"127.0.0.1"+":"+ NSConf.NAMINGNODE_PORT +"/node/size";
 
         // Set headers if necessary
         HttpHeaders headers = new HttpHeaders();
@@ -209,7 +230,7 @@ public class NamingService {
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
-
+        System.out.println("send");
         // Print response
         System.out.println("Response: " + response.getBody());
     }
