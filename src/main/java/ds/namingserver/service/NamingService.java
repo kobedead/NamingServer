@@ -218,6 +218,8 @@ public class NamingService {
 
         final String uri = "http://"+ requestingNodeIp +":"+ NSConf.NAMINGNODE_PORT +"/node/size";
 
+        System.out.println("Call to " + uri);
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
@@ -225,10 +227,15 @@ public class NamingService {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
-        System.out.println("send");
-        // Print response
-        System.out.println("Response: " + response.getBody());
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
+            System.out.println("send");
+            // Print response
+            System.out.println("Response: " + response.getBody());
+        } catch (Exception e) {
+            System.out.println("Error processing incoming multicast" + e.getMessage());
+        }
+
     }
 
     public Map<Integer, String> getNextAndPrevious(String name) {
