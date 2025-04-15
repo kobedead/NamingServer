@@ -4,8 +4,6 @@ import ds.namingserver.Config.NSConf;
 import ds.namingserver.CustomMap.LocalJsonMap;
 import ds.namingserver.Multicast.MulticastListener;
 import jakarta.annotation.PostConstruct;
-import org.apache.catalina.core.StandardThreadExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,8 +12,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.ArrayList;
+
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -233,5 +232,40 @@ public class NamingService {
         System.out.println("send");
         // Print response
         System.out.println("Response: " + response.getBody());
+    }
+
+    public Map<Integer, String> getNextAndPrevious(String name) {
+        int hash = mapHash(name);
+        int diff1 = Integer.MIN_VALUE;
+        int diff2 = Integer.MAX_VALUE;
+        Map<Integer, String> nextAndPrevMap = new HashMap<>();
+
+        int previousHash = 0;
+        String previousIp = "";
+        int nextHash = 0;
+        String nextIp = "";
+
+
+        for (Map.Entry<Integer, String> entry : map.entrySet()) {
+            // Received hash is equal to one found in the map
+            if (entry.getKey().equals(hash)) {
+                // Do  nothing
+            } else if (entry.getKey() > hash) { // Received hash is lower than one iterated over in map
+                if (hash - entry.getKey() > diff1) {
+                    diff1 = entry.getKey() - hash;
+                    previousHash = entry.getKey();
+                    previousIp = entry.getValue();
+                }
+            } else { // Received hash is greater than one iterated over in map
+                if (hash - entry.getKey() < diff2) {
+                    diff2 = entry.getKey() - hash;
+                    nextHash = entry.getKey();
+                    nextIp = entry.getValue();
+                }
+            }
+        }
+        nextAndPrevMap.put(previousHash, previousIp);
+        nextAndPrevMap.put(nextHash, nextIp);
+        return nextAndPrevMap;
     }
 }

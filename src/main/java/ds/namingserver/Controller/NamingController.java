@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @RestController
@@ -102,6 +104,14 @@ public class NamingController {
 
         return namingservice.sendFile(file);
 
+
+
+    }
+
+    @GetMapping("/node/nextAndPrevious/{name}")
+    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable String name) {
+        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(name);
+        return new ResponseEntity<>(nextAndPreviousMap, HttpStatus.OK);
     }
 
 

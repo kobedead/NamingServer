@@ -7,7 +7,7 @@ public class AddNodeDTO {
     String ip ;
 
 
-    AddNodeDTO(){
+    public AddNodeDTO(){
 
     }
 
