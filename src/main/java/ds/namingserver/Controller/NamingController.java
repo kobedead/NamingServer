@@ -89,7 +89,7 @@ public class NamingController {
      */
     @DeleteMapping("/node/by-ip/{ip}")
     public ResponseEntity<String> removeNodeByIp(@PathVariable String ip) {
-        namingservice.deleteNodeByName(ip);
+        namingservice.deleteNodeByIp(ip);
         logger.info("Node removed from Server, ip = "+ ip);
         return ResponseEntity.ok("Node removed successfully");
     }
