@@ -64,7 +64,7 @@ public class MulticastListener  {
                   //if message has prefix we need to process it
                     String name = extractName(message);                 //check
                     if (name != null){
-                        namingService.processIncomingMulticast(sourceAddress.toString() ,name);
+                        namingService.processIncomingMulticast(sourceAddress.toString().replace("/", "") ,name);
                     }
                     else
                         System.out.println("Name not found in multicast message");

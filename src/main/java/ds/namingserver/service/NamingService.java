@@ -215,6 +215,7 @@ public class NamingService {
         int numberOfNodes = map.size();
 
         System.out.println("number of nodes : " + numberOfNodes);
+        System.out.println("test");
 
         final String uri = "http://"+ requestingNodeIp +":"+ NSConf.NAMINGNODE_PORT +"/node/size";
 
