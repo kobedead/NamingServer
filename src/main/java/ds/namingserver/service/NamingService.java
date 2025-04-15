@@ -16,13 +16,14 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service
 public class NamingService {
 
-    private Map<Integer, String> map;
+    private LocalJsonMap<Integer, String> map;
 
     public final String MAP_PATH = "src/main/resources/map.json";
 
@@ -61,16 +62,30 @@ public class NamingService {
 
     /**
      * Returns the value associated with the node name
-     * @param nodename name of the node to fetch the IP from
+     * @param nodeName name of the node to fetch the IP from
      * @return IP-address
      */
-    public String getNode(String nodename) {
-        int hash = mapHash(nodename);
+    public String getNodeIpFromName(String nodeName) {
+        int hash = mapHash(nodeName);
         String value = map.get(hash);
         if (value != null) {
             return value;
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node" + nodename + " was not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node" + nodeName + "(name) was not found");
+        }
+    }
+
+    /**
+     * Returns the value associated with the node id
+     * @param nodeId name of the node to fetch the IP from
+     * @return IP-address
+     */
+    public String getNodeIpFromId(int nodeId) {
+        String value = map.get(nodeId);
+        if (value != null) {
+            return value;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node" + nodeId + "(ID) was not found");
         }
     }
 
@@ -93,10 +108,22 @@ public class NamingService {
      * Removes node and update JSON if it is found in the map
      * @param nodeName name of the node that will be removed
      */
-    public void deleteNode(String nodeName) {
+    public void deleteNodeByName(String nodeName) {
         int hashedName = mapHash(nodeName);
         if (map.containsKey(hashedName)) {
             map.remove(hashedName);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
+        }
+    }
+
+    /**
+     * Removes node and update JSON if it is found in the map
+     * @param nodeIp ip of the node that will be removed
+     */
+    public void deleteNodeByIp(String nodeIp) {
+        if (map.containsValue(nodeIp)) {
+            map.removeValue(nodeIp);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
         }
@@ -196,7 +223,7 @@ public class NamingService {
         return map;
     }
 
-    public void setMap(Map<Integer, String> map) {
+    public void setMap(LocalJsonMap<Integer, String> map) {
         this.map = map;
     }
 
@@ -239,8 +266,17 @@ public class NamingService {
 
     }
 
-    public Map<Integer, String> getNextAndPrevious(String name) {
-        int hash = mapHash(name);
+    public Map<Integer, String> getNextAndPrevious(String ip) {
+        Integer hash = map.entrySet().stream()
+                .filter(entry -> Objects.equals(entry.getValue(), ip))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+
+        if (hash == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node does not exist");
+        }
+
         int diff1 = Integer.MIN_VALUE;
         int diff2 = Integer.MAX_VALUE;
         Map<Integer, String> nextAndPrevMap = new HashMap<>();

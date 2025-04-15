@@ -3,21 +3,14 @@ package ds.namingserver.Controller;
 import ds.namingserver.Model.AddNodeDTO;
 import ds.namingserver.service.NamingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -37,18 +30,30 @@ public class NamingController {
 
 
     /**
-     * Get ip of node form name
+     * Get ip of node from name
      *
      * @param name name of the node you want to receive ip from
      * @return The ip of the node
      */
-    @GetMapping("/node/{name}")
+    @GetMapping("/node/by-name/{name}")
     public String getNodeIP(@PathVariable String name) {
-        String ip = namingservice.getNode(name);
-        logger.info("Called get Ip for node : " + name + "with ip : " + ip );
+        String ip = namingservice.getNodeIpFromName(name);
+        logger.info("Called get Ip for node : " + name + "(name) with ip : " + ip );
         return ip;
     }
 
+    /**
+     * Get ip of node from ID (hash)
+     *
+     * @param id of the node you want to receive ip from
+     * @return The ip of the node
+     */
+    @GetMapping("/node/by-id/{id}")
+    public String getNodeIP(@PathVariable int id) {
+        String ip = namingservice.getNodeIpFromId(id);
+        logger.info("Called get Ip for node : " + id + " (ID) with ip : " + ip );
+        return ip;
+    }
 
     /**
      * Add Node to server
@@ -69,10 +74,23 @@ public class NamingController {
      * @param name name of Node
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/node/{name}")
-    public ResponseEntity<String> removeNode(@PathVariable String name) {
-        namingservice.deleteNode(name);
+    @DeleteMapping("/node/by-name/{name}")
+    public ResponseEntity<String> removeNodeByName(@PathVariable String name) {
+        namingservice.deleteNodeByName(name);
         logger.info("Node removed from Server, Name = "+ name);
+        return ResponseEntity.ok("Node removed successfully");
+    }
+
+    /**
+     * remove Node from server
+     *
+     * @param ip of Node
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping("/node/by-ip/{ip}")
+    public ResponseEntity<String> removeNodeByIp(@PathVariable String ip) {
+        namingservice.deleteNodeByName(ip);
+        logger.info("Node removed from Server, ip = "+ ip);
         return ResponseEntity.ok("Node removed successfully");
     }
 
@@ -108,15 +126,9 @@ public class NamingController {
 
     }
 
-    @GetMapping("/node/nextAndPrevious/{name}")
-    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable String name) {
-        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(name);
+    @GetMapping("/node/nextAndPrevious/{ip}")
+    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable String ip) {
+        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(ip);
         return new ResponseEntity<>(nextAndPreviousMap, HttpStatus.OK);
     }
-
-
-
-
-
-
 }

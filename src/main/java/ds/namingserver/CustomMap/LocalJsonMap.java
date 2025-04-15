@@ -37,6 +37,12 @@ public class LocalJsonMap<K, V> extends HashMap<K, V> {
         return result;
     }
 
+    public void removeValue(Object value) {
+        super.values().remove(value);
+        updateJSON();
+    }
+
+
 
     /**
      * Update the JSON file with the current objects that are stored in memory in map

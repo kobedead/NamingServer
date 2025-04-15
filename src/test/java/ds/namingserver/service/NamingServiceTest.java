@@ -46,20 +46,20 @@ class NamingServiceTest {
     }
 
     @Test
-    void getNode() {
+    void getNodeIpFromName() {
         // Happy path
-        assertEquals("192.168.1.1", namingService.getNode("node_11111"));
+        assertEquals("192.168.1.1", namingService.getNodeIpFromName("node_11111"));
 
         // Alternative path
         // Get node that does not exist
-        assertThrows(ResponseStatusException.class, () -> namingService.getNode("non_existant_node"));
+        assertThrows(ResponseStatusException.class, () -> namingService.getNodeIpFromName("non_existant_node"));
     }
 
     @Test
     void addNode() {
         // Happy path
         namingService.addNode("node_44444", "192.168.1.4");
-        assertEquals("192.168.1.4", namingService.getNode("node_44444"));
+        assertEquals("192.168.1.4", namingService.getNodeIpFromName("node_44444"));
 
         // Alternative path
         // Add an already existing node
@@ -67,13 +67,13 @@ class NamingServiceTest {
     }
 
     @Test
-    void deleteNode() {
+    void deleteNodeByName() {
         // Happy path
-        namingService.deleteNode("node_11111");
+        namingService.deleteNodeByName("node_11111");
 
         // Alternative path
         // Remove a node that does not exist
-        assertThrows(ResponseStatusException.class, () -> namingService.deleteNode("non-existant-node"));
+        assertThrows(ResponseStatusException.class, () -> namingService.deleteNodeByName("non-existant-node"));
     }
 
     @AfterAll
