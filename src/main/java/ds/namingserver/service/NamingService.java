@@ -306,7 +306,7 @@ public class NamingService {
             }
         }
 
-        Map<Integer, String> copiedMap = new HashMap<>(nextAndPrevMap);
+        Map<Integer, String> copiedMap = new HashMap<>(map);
         copiedMap.remove(hash);
 
         // There is no lower previousHash
