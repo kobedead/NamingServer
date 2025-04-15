@@ -216,16 +216,13 @@ public class NamingService {
 
         System.out.println("number of nodes : " + numberOfNodes);
 
-        final String uri = "http://"+"127.0.0.1"+":"+ NSConf.NAMINGNODE_PORT +"/node/size";
+        final String uri = "http://"+ requestingNodeIp +":"+ NSConf.NAMINGNODE_PORT +"/node/size";
 
-        // Set headers if necessary
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
-        // Wrap the integer in HttpEntity
         HttpEntity<Integer> requestEntity = new HttpEntity<>(numberOfNodes, headers);
 
-        // Send request using exchange()
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
