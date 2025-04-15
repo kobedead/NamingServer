@@ -28,6 +28,7 @@ public class MulticastListener  {
         try {
             // Create the multicast socket
             socket = new MulticastSocket(NSConf.MULTICAST_PORT);
+            socket.setReuseAddress(true);
 
             // Create a multicast group address
             group = InetAddress.getByName(NSConf.MULTICAST_GROUP);
