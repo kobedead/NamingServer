@@ -281,23 +281,23 @@ public class NamingService {
         int diff2 = Integer.MAX_VALUE;
         Map<Integer, String> nextAndPrevMap = new HashMap<>();
 
-        int previousHash = 0;
+        int previousHash = -10;
         String previousIp = "";
-        int nextHash = 0;
+        int nextHash = -10;
         String nextIp = "";
 
 
         for (Map.Entry<Integer, String> entry : map.entrySet()) {
             // Received hash is equal to one found in the map
-            if (entry.getKey().equals(hash)) {
-                // Do  nothing
-            } else if (entry.getKey() > hash) { // Received hash is lower than one iterated over in map
+             if (entry.getKey() > hash) { // Received hash is lower than one iterated over in map
                 if (hash - entry.getKey() > diff1) {
                     diff1 = entry.getKey() - hash;
                     previousHash = entry.getKey();
                     previousIp = entry.getValue();
                 }
-            } else { // Received hash is greater than one iterated over in map
+            }
+
+             if (entry.getKey() < hash) { // Received hash is greater than one iterated over in map
                 if (hash - entry.getKey() < diff2) {
                     diff2 = entry.getKey() - hash;
                     nextHash = entry.getKey();
@@ -305,6 +305,21 @@ public class NamingService {
                 }
             }
         }
+
+        // There is no lower previousHash
+        if (previousHash == -10) {
+            // Take the max hash
+            previousHash = map.keySet().stream().max(Integer::compareTo).orElseThrow();
+            previousIp = map.get(previousHash);
+        }
+
+        // There is no greater nextHash
+        if (nextHash == -10) {
+            // Take the min hash
+            nextHash = map.keySet().stream().min(Integer::compareTo).orElseThrow();
+            nextIp = map.get(nextHash);
+        }
+
         nextAndPrevMap.put(previousHash, previousIp);
         nextAndPrevMap.put(nextHash, nextIp);
         return nextAndPrevMap;
