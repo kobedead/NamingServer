@@ -312,15 +312,23 @@ public class NamingService {
         // There is no lower previousHash
         if (previousHash == -10) {
             // Take the max hash
-            previousHash = copiedMap.keySet().stream().max(Integer::compareTo).orElseThrow();
-            previousIp = copiedMap.get(previousHash);
+            Map.Entry<Integer, String> maxEntry = copiedMap.entrySet()
+                    .stream()
+                    .max(Map.Entry.comparingByKey())
+                    .orElse(null);
+            previousHash =  maxEntry.getKey();
+            previousIp = maxEntry.getValue();
         }
 
         // There is no greater nextHash
         if (nextHash == -10) {
             // Take the min hash
-            nextHash = copiedMap.keySet().stream().min(Integer::compareTo).orElseThrow();
-            nextIp = copiedMap.get(nextHash);
+            Map.Entry<Integer, String> minEntry = copiedMap.entrySet()
+                    .stream()
+                    .min(Map.Entry.comparingByKey())
+                    .orElse(null); // returns null if map is empty
+            nextHash = minEntry.getKey();
+            nextIp = minEntry.getValue();
         }
 
         nextAndPrevMap.put(previousHash, previousIp);
