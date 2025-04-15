@@ -306,6 +306,8 @@ public class NamingService {
             }
         }
 
+        map.remove(hash); // Make sure max or min is not its own hash
+
         // There is no lower previousHash
         if (previousHash == -10) {
             // Take the max hash
