@@ -306,20 +306,21 @@ public class NamingService {
             }
         }
 
-        map.remove(hash); // Make sure max or min is not its own hash
+        Map<Integer, String> copiedMap = new HashMap<>(nextAndPrevMap);
+        copiedMap.remove(hash);
 
         // There is no lower previousHash
         if (previousHash == -10) {
             // Take the max hash
-            previousHash = map.keySet().stream().max(Integer::compareTo).orElseThrow();
-            previousIp = map.get(previousHash);
+            previousHash = copiedMap.keySet().stream().max(Integer::compareTo).orElseThrow();
+            previousIp = copiedMap.get(previousHash);
         }
 
         // There is no greater nextHash
         if (nextHash == -10) {
             // Take the min hash
-            nextHash = map.keySet().stream().min(Integer::compareTo).orElseThrow();
-            nextIp = map.get(nextHash);
+            nextHash = copiedMap.keySet().stream().min(Integer::compareTo).orElseThrow();
+            nextIp = copiedMap.get(nextHash);
         }
 
         nextAndPrevMap.put(previousHash, previousIp);
