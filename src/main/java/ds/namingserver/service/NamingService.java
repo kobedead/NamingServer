@@ -40,7 +40,34 @@ public class NamingService {
 
     @PostConstruct
     public void startMulticastListener() {
+        pingMap();
         multicastExecutor.submit(multicastListener::run);
+    }
+
+    /**
+     * Iterate over whole map and ping every entry to check if its on network
+     */
+    private void pingMap() {
+
+        System.out.println("Pinging the whole map");
+        for (Integer i : map.keySet()) {
+            String ip = map.get(i);
+
+            if (Objects.equals(ip, "")) {
+                map.remove(i);
+            }
+
+            String url = "http://" + ip + ":" + NSConf.NAMINGNODE_PORT + "/node/ping";
+            RestTemplate restTemplate = new RestTemplate();
+
+            try {
+                String response = restTemplate.getForObject(url, String.class);
+                System.out.println("Found node " + i + "active on network , response " + response);
+            } catch (Exception e) {
+                map.remove(i);
+                System.out.println("Node : " + i + "not on network, DELETING...");
+            }
+        }
     }
 
     /**
@@ -244,11 +271,17 @@ public class NamingService {
         //calc hash
         int hashName = mapHash(name);
 
-        //add node to map
-        map.put(hashName , requestingNodeIp);
+        int numberOfNodes ;
 
-        //return number of nodes on network (in map)
-        int numberOfNodes = map.size();
+        //add node to map, if node already in map return -1
+        if(map.containsKey(hashName)) {
+            numberOfNodes = -1;
+            System.out.println("Node with hash already in map");
+        }
+        else {
+            map.put(hashName, requestingNodeIp);
+            numberOfNodes = map.size();
+        }
 
         System.out.println("number of nodes : " + numberOfNodes);
         System.out.println("test");
