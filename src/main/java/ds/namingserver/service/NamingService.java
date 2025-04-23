@@ -13,10 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,12 +46,16 @@ public class NamingService {
      */
     private void pingMap() {
 
-        System.out.println("Pinging the whole map");
-        for (Integer i : map.keySet()) {
-            String ip = map.get(i);
+        Iterator<Map.Entry<Integer, String>> iterator = map.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, String> entry = iterator.next();
+            Integer i = entry.getKey();
+            String ip = entry.getValue();
 
             if (Objects.equals(ip, "")) {
-                map.remove(i);
+                iterator.remove();
+                continue;
             }
 
             String url = "http://" + ip + ":" + NSConf.NAMINGNODE_PORT + "/node/ping";
@@ -62,12 +63,13 @@ public class NamingService {
 
             try {
                 String response = restTemplate.getForObject(url, String.class);
-                System.out.println("Found node " + i + "active on network , response " + response);
+                System.out.println("Found node " + i + " active on network, response: " + response);
             } catch (Exception e) {
-                map.remove(i);
-                System.out.println("Node : " + i + "not on network, DELETING...");
+                iterator.remove();
+                System.out.println("Node: " + i + " not on network, DELETING...");
             }
         }
+
     }
 
     /**
