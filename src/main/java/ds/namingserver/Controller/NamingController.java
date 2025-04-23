@@ -96,6 +96,22 @@ public class NamingController {
 
 
     /**
+     * remove Node from server
+     *
+     * @param id of Node
+     * @return the ResponseEntity with status 200 (OK)
+     */
+    @DeleteMapping("/node/by-id/{id}")
+    public ResponseEntity<String> removeNodeById(@PathVariable Integer id) {
+        namingservice.deleteNodeById(id);
+        logger.info("Node removed from Server, ip = "+ id);
+        return ResponseEntity.ok("Node removed successfully");
+    }
+
+
+
+
+    /**
      * Get file from correct node from name of file
      *
      * @param filename name of the file

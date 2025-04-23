@@ -129,6 +129,15 @@ public class NamingService {
         }
     }
 
+    /**
+     * Removes node and update JSON if it is found in the map
+     * @param nodeId ip of the node that will be removed
+     */
+    public void deleteNodeById(int nodeId) {
+        if(map.remove(nodeId) == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
+    }
+
 
 
     public ResponseEntity<Resource> getFile(String filename)  {

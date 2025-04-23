@@ -42,8 +42,6 @@ public class LocalJsonMap<K, V> extends HashMap<K, V> {
         updateJSON();
     }
 
-
-
     /**
      * Update the JSON file with the current objects that are stored in memory in map
      */
