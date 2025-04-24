@@ -69,7 +69,7 @@ public class NamingService {
                 System.out.println("Node: " + i + " not on network, DELETING...");
             }
         }
-
+        map.updateJSON();
     }
 
     /**
