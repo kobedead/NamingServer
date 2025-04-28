@@ -42,7 +42,8 @@ public class NamingService {
     }
 
     /**
-     * Iterate over whole map and ping every entry to check if its on network
+     * Iterate over whole map and ping every entry to check if its on network.
+     * If node not in network, delete from map.
      */
     private void pingMap() {
 
@@ -265,7 +266,12 @@ public class NamingService {
         this.map = map;
     }
 
-
+    /**
+     * Method to handle the incoming multicast from nodes.
+     * Put node in map if not already. And send back the number of nodes on network
+     * @param requestingNodeIp Ip of node that sent the multicast.
+     * @param name Name of the node that sent the multicast.
+     */
     public void processIncomingMulticast(String requestingNodeIp , String name) {
 
         System.out.println("Got the incoming multicast" + requestingNodeIp);
@@ -309,6 +315,7 @@ public class NamingService {
         }
 
     }
+
 
     public Map<Integer, String> getNextAndPrevious(String ip) {
         Integer hash = map.entrySet().stream()
