@@ -29,31 +29,6 @@ public class NamingController {
     }
 
 
-    /**
-     * Get ip of node from name
-     *
-     * @param name name of the node you want to receive ip from
-     * @return The ip of the node
-     */
-    @GetMapping("/node/by-name/{name}")
-    public String getNodeIP(@PathVariable String name) {
-        String ip = namingservice.getNodeIpFromName(name);
-        logger.info("Called get Ip for node : " + name + "(name) with ip : " + ip );
-        return ip;
-    }
-
-    /**
-     * Get ip of node from ID (hash)
-     *
-     * @param id of the node you want to receive ip from
-     * @return The ip of the node
-     */
-    @GetMapping("/node/by-id/{id}")
-    public String getNodeIP(@PathVariable int id) {
-        String ip = namingservice.getNodeIpFromId(id);
-        logger.info("Called get Ip for node : " + id + " (ID) with ip : " + ip );
-        return ip;
-    }
 
     /**
      * Add Node to server

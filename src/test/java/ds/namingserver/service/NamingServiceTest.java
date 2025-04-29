@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
+import static ds.namingserver.Config.NSConf.MAP_PATH;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -27,7 +29,7 @@ class NamingServiceTest {
     @BeforeEach
     void setUp() throws IOException {
         // Backup the original JSON file
-        Files.copy(Paths.get(namingService.MAP_PATH), Paths.get(JSON_FILE_PATH_BACKUP), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(Paths.get(MAP_PATH), Paths.get(JSON_FILE_PATH_BACKUP), StandardCopyOption.REPLACE_EXISTING);
 
         namingService.setMap(new LocalJsonMap<>(JSON_FILE_PATH_BACKUP));
 
@@ -78,6 +80,6 @@ class NamingServiceTest {
 
     @AfterAll
     void restore(){
-        namingService.setMap(new LocalJsonMap<>(namingService.MAP_PATH));
+        namingService.setMap(new LocalJsonMap<>(MAP_PATH));
     }
 }

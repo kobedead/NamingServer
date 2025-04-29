@@ -16,5 +16,10 @@ public class NSConf {
     public static final int MULTICAST_PORT = 4446;
     public static final String PREFIX = "joining";  // Example filter keyword
 
+    /// node map path
+    public static final String MAP_PATH = "src/main/resources/map.json";
+
+
+
 
 }

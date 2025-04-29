@@ -17,12 +17,13 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static ds.namingserver.Config.NSConf.MAP_PATH;
+
 @Service
 public class NamingService {
 
     private LocalJsonMap<Integer, String> map;
 
-    public final String MAP_PATH = "src/main/resources/map.json";
 
     private final ExecutorService multicastExecutor;
     private MulticastListener multicastListener;
