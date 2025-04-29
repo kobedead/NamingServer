@@ -108,6 +108,27 @@ public class NamingController {
         return ResponseEntity.ok("Node removed successfully");
     }
 
+    @GetMapping("/node/nextAndPrevious/{ip}")
+    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable String ip) {
+        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(ip);
+        return new ResponseEntity<>(nextAndPreviousMap, HttpStatus.OK);
+    }
+
+
+
+    /**
+     * Gets filename and sends ip back of node it belongs to
+     *
+     * @param filename file
+     * @return the file
+     */
+    @GetMapping("/node/by-filename/{filename}")
+    public ResponseEntity getIpOfNodeFromFile(@PathVariable("filename") String filename) {
+        String IPofNode = namingservice.getNodeFromName(filename);
+        ResponseEntity<String> ip = new ResponseEntity<>(IPofNode , HttpStatus.OK);
+
+        return ip;
+    }
 
 
 
@@ -135,16 +156,28 @@ public class NamingController {
      */
     @PostMapping("/file")
     public ResponseEntity uploadFile(@RequestBody MultipartFile file ) throws IOException {
-
         return namingservice.sendFile(file);
-
-
-
     }
 
-    @GetMapping("/node/nextAndPrevious/{ip}")
-    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable String ip) {
-        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(ip);
-        return new ResponseEntity<>(nextAndPreviousMap, HttpStatus.OK);
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

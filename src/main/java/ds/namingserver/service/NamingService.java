@@ -218,43 +218,7 @@ public class NamingService {
 
 
     public String getNodeFromName(String filename){
-
-        int hashOfName = mapHash(filename);
-
-        System.out.println("Begin debug");
-
-        System.out.println(filename);
-        System.out.println(hashOfName);
-        System.out.println("hashes in map : ");
-        map.keySet().forEach(System.out::println);
-
-
-        Integer closest = null;
-        int minDifference = Integer.MAX_VALUE;
-
-        for (int num : map.keySet()) {
-            if (num < hashOfName) { // Ensure we only consider smaller values
-                int difference = hashOfName - num; // Difference should be positive
-                if (difference < minDifference) {
-                    closest = num;
-                    minDifference = difference;
-                }
-            }
-        }
-
-        // If no smaller key found, get the largest key
-        if (closest == null) {
-            closest = Collections.max(map.keySet());
-        }
-
-
-        System.out.println("Found hash : " + closest);
-        System.out.println("Found Ip : " +  map.get(closest));
-
-        System.out.println("End debug");
-
-
-        return map.get(closest);
+        return map.getPreviousWithWrap(mapHash(filename));
     }
 
 
