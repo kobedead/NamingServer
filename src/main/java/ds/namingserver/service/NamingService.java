@@ -3,6 +3,7 @@ package ds.namingserver.service;
 import ds.namingserver.Config.NSConf;
 import ds.namingserver.CustomMap.LocalJsonMap;
 import ds.namingserver.Multicast.MulticastListener;
+import ds.namingserver.Utilities.Utilities;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -26,7 +27,7 @@ public class NamingService {
 
 
     private final ExecutorService multicastExecutor;
-    private MulticastListener multicastListener;
+    private final MulticastListener multicastListener;
 
     public NamingService()
     {
@@ -74,22 +75,7 @@ public class NamingService {
         map.updateJSON();
     }
 
-    /**
-     * Hashing function to hash incoming names (based on given hashing algorithm)
-     * @param text name of the node or file to be hashed
-     * @return hashed integer value
-     */
-    public int mapHash(String text) {
-        int hashCode = text.hashCode();
-        int max = Integer.MAX_VALUE;
-        int min = Integer.MIN_VALUE;
-        
-        // Ensure the hashCode is always positive
-        int adjustedHash = Math.abs(hashCode);
-        
-        // Mapping hashCode from (Integer.MIN_VALUE, Integer.MAX_VALUE) to (0, 32768)
-        return (int) (((long) adjustedHash * 32768) / ((long) max - min));
-    }
+
 
     /**
      * Returns the value associated with the node name
@@ -97,7 +83,7 @@ public class NamingService {
      * @return IP-address
      */
     public String getNodeIpFromName(String nodeName) {
-        int hash = mapHash(nodeName);
+        int hash = Utilities.mapHash(nodeName);
         String value = map.get(hash);
         if (value != null) {
             return value;
@@ -106,19 +92,6 @@ public class NamingService {
         }
     }
 
-    /**
-     * Returns the value associated with the node id
-     * @param nodeId name of the node to fetch the IP from
-     * @return IP-address
-     */
-    public String getNodeIpFromId(int nodeId) {
-        String value = map.get(nodeId);
-        if (value != null) {
-            return value;
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node" + nodeId + "(ID) was not found");
-        }
-    }
 
     /**
      * Add node to the map and update the JSON if node does not exist
@@ -126,7 +99,7 @@ public class NamingService {
      * @param ip ip address of the node to be added
      */
     public void addNode(String nodeName, String ip) {
-        int hashedName = mapHash(nodeName);
+        int hashedName = Utilities.mapHash(nodeName);
         System.out.println(hashedName);
         if (map.containsKey(hashedName)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This node already exists");
@@ -140,7 +113,7 @@ public class NamingService {
      * @param nodeName name of the node that will be removed
      */
     public void deleteNodeByName(String nodeName) {
-        int hashedName = mapHash(nodeName);
+        int hashedName = Utilities.mapHash(nodeName);
         if (map.containsKey(hashedName)) {
             map.remove(hashedName);
         } else {
@@ -148,17 +121,7 @@ public class NamingService {
         }
     }
 
-    /**
-     * Removes node and update JSON if it is found in the map
-     * @param nodeIp ip of the node that will be removed
-     */
-    public void deleteNodeByIp(String nodeIp) {
-        if (map.containsValue(nodeIp)) {
-            map.removeValue(nodeIp);
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
-        }
-    }
+
 
     /**
      * Removes node and update JSON if it is found in the map
@@ -170,10 +133,17 @@ public class NamingService {
     }
 
 
-
+    /**
+     * Method getFile
+     * Gets a file from the right node and returns as ResponseEntity
+     *
+     *
+     * @param filename the file to search for
+     * @return ResponseEntity with file in
+     */
     public ResponseEntity<Resource> getFile(String filename)  {
 
-        String ip = getNodeFromName(filename);
+        String ip = getNodeFromFileName(filename);
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file/"+filename;
 
@@ -186,10 +156,18 @@ public class NamingService {
         return response;
         }
 
+
+    /**
+     * Method sendFile
+     * Send a given file to the right node
+     *
+     * @param file file to send to node
+     * @return ResponseEntity with status of the received (responses)
+     */
     public ResponseEntity<String> sendFile(MultipartFile file)  {
 
 
-        String ip = getNodeFromName(file.getOriginalFilename());
+        String ip = getNodeFromFileName(file.getOriginalFilename());
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file";
 
@@ -216,10 +194,16 @@ public class NamingService {
     }
 
 
-
-
-    public String getNodeFromName(String filename){
-        return map.getPreviousWithWrap(mapHash(filename));
+    /**
+     * Method getNodeFromFileName
+     * Returns the id of the node that corresponds to the filename
+     * Follows the specs given in the exercise
+     *
+     * @param filename filename to find node for
+     * @return id of node where the file belongs
+     */
+    public String getNodeFromFileName(String filename){
+        return map.getPreviousWithWrap(Utilities.mapHash(filename));
     }
 
 
@@ -242,7 +226,7 @@ public class NamingService {
         System.out.println("Got the incoming multicast" + requestingNodeIp);
 
         //calc hash
-        int hashName = mapHash(name);
+        int hashName = Utilities.mapHash(name);
 
         int numberOfNodes ;
 
@@ -281,74 +265,30 @@ public class NamingService {
 
     }
 
+    /**
+     * Method getNextAndPrevious
+     * Get the next and previous node from given node id (in map)
+     *
+     * @param id id of node to look for neighbors
+     * @return next and previous node in map.
+     */
+    public Map<Integer, String> getNextAndPrevious(Integer id) {
 
-    public Map<Integer, String> getNextAndPrevious(String ip) {
-        Integer hash = map.entrySet().stream()
-                .filter(entry -> Objects.equals(entry.getValue(), ip))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
-
-        if (hash == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node does not exist");
-        }
-
-        int diff1 = Integer.MIN_VALUE;
-        int diff2 = Integer.MAX_VALUE;
         Map<Integer, String> nextAndPrevMap = new HashMap<>();
 
-        int previousHash = -10;
-        String previousIp = "";
-        int nextHash = -10;
-        String nextIp = "";
 
+        int nextKey = map.getNextKeyWithWrap(id);
+        int previousKey = map.getPreviousKeyWithWrap(id);
 
-        for (Map.Entry<Integer, String> entry : map.entrySet()) {
-            // Received hash is equal to one found in the map
-             if (entry.getKey() > hash) { // Received hash is lower than one iterated over in map
-                if (hash - entry.getKey() > diff1) {
-                    diff1 = entry.getKey() - hash;
-                    previousHash = entry.getKey();
-                    previousIp = entry.getValue();
-                }
-            }
-
-             if (entry.getKey() < hash) { // Received hash is greater than one iterated over in map
-                if (hash - entry.getKey() < diff2) {
-                    diff2 = entry.getKey() - hash;
-                    nextHash = entry.getKey();
-                    nextIp = entry.getValue();
-                }
-            }
+        if (nextKey == previousKey){
+            nextAndPrevMap.put(nextKey,map.get(nextKey));
+        }
+        else {
+            nextAndPrevMap.put(nextKey, map.get(nextKey));
+            nextAndPrevMap.put(previousKey, map.get(nextKey));
         }
 
-        Map<Integer, String> copiedMap = new HashMap<>(map);
-        copiedMap.remove(hash);
-
-        // There is no lower previousHash
-        if (previousHash == -10) {
-            // Take the max hash
-            Map.Entry<Integer, String> maxEntry = copiedMap.entrySet()
-                    .stream()
-                    .max(Map.Entry.comparingByKey())
-                    .orElse(null);
-            previousHash =  maxEntry.getKey();
-            previousIp = maxEntry.getValue();
-        }
-
-        // There is no greater nextHash
-        if (nextHash == -10) {
-            // Take the min hash
-            Map.Entry<Integer, String> minEntry = copiedMap.entrySet()
-                    .stream()
-                    .min(Map.Entry.comparingByKey())
-                    .orElse(null); // returns null if map is empty
-            nextHash = minEntry.getKey();
-            nextIp = minEntry.getValue();
-        }
-
-        nextAndPrevMap.put(previousHash, previousIp);
-        nextAndPrevMap.put(nextHash, nextIp);
         return nextAndPrevMap;
+
     }
 }

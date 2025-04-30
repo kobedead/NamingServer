@@ -20,7 +20,7 @@ public class MulticastListener  {
 
     private final NamingService namingService;
 
-
+    private boolean running = true;
 
     public MulticastListener(NamingService namingService) {
         this.namingService = namingService;
@@ -50,7 +50,7 @@ public class MulticastListener  {
 
         System.out.println("Listening for multicast messages on group: " + NSConf.MULTICAST_GROUP + " and port: " + NSConf.MULTICAST_PORT);
 
-        while (true) {
+        while (running) {
             try {
                 // Receive the incoming packet
                 socket.receive(packet);
@@ -82,6 +82,7 @@ public class MulticastListener  {
         try {
             socket.leaveGroup(group);
             socket.close();
+            running = false;
         } catch (IOException e) {
             e.printStackTrace();
         }

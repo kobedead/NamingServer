@@ -114,4 +114,34 @@ public class LocalJsonMap<K extends Comparable<K>, V> extends TreeMap<K, V> {
             }
         }
     }
+
+
+    public K getNextKeyWithWrap(K key) {
+        K nextKey = this.higherKey(key);
+        if (nextKey != null) {
+            return nextKey;
+        } else {
+            // Wrap around to the first (smallest) key
+            if (!isEmpty()) {
+                return this.firstKey();
+            } else {
+                return null; // Or throw an exception if the map is empty
+            }
+        }
+    }
+
+    public K getPreviousKeyWithWrap(K key) {
+        K previousKey = this.lowerKey(key);
+        if (previousKey != null) {
+            return previousKey;
+        } else {
+            // Wrap around to the last (largest) key
+            if (!isEmpty()) {
+                return this.lastKey();
+            } else {
+                return null; // Or throw an exception if the map is empty
+            }
+        }
+    }
+
 }

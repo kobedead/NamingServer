@@ -31,6 +31,20 @@ public class NamingController {
 
 
     /**
+     * Get ip of node from name
+     *
+     * @param name name of the node you want to receive ip from
+     * @return The ip of the node
+     */
+    @GetMapping("/node/by-name/{name}")
+    public String getNodeIP(@PathVariable String name) {
+        String ip = namingservice.getNodeIpFromName(name);
+        logger.info("Called get Ip for node : " + name + "(name) with ip : " + ip );
+        return ip;
+    }
+
+
+    /**
      * Add Node to server
      *
      * @param addNodeDTO DTO with name and ip of node
@@ -56,19 +70,6 @@ public class NamingController {
         return ResponseEntity.ok("Node removed successfully");
     }
 
-    /**
-     * remove Node from server
-     *
-     * @param ip of Node
-     * @return the ResponseEntity with status 200 (OK)
-     */
-    @DeleteMapping("/node/by-ip/{ip}")
-    public ResponseEntity<String> removeNodeByIp(@PathVariable String ip) {
-        namingservice.deleteNodeByIp(ip);
-        logger.info("Node removed from Server, ip = "+ ip);
-        return ResponseEntity.ok("Node removed successfully");
-    }
-
 
     /**
      * remove Node from server
@@ -83,9 +84,11 @@ public class NamingController {
         return ResponseEntity.ok("Node removed successfully");
     }
 
-    @GetMapping("/node/nextAndPrevious/{ip}")
-    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable String ip) {
-        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(ip);
+
+
+    @GetMapping("/node/nextAndPrevious/{id}")
+    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable Integer id) {
+        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(id);
         return new ResponseEntity<>(nextAndPreviousMap, HttpStatus.OK);
     }
 
@@ -99,7 +102,7 @@ public class NamingController {
      */
     @GetMapping("/node/by-filename/{filename}")
     public ResponseEntity getIpOfNodeFromFile(@PathVariable("filename") String filename) {
-        String IPofNode = namingservice.getNodeFromName(filename);
+        String IPofNode = namingservice.getNodeFromFileName(filename);
         ResponseEntity<String> ip = new ResponseEntity<>(IPofNode , HttpStatus.OK);
 
         return ip;
