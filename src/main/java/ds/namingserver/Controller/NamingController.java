@@ -80,7 +80,7 @@ public class NamingController {
     @DeleteMapping("/node/by-id/{id}")
     public ResponseEntity<String> removeNodeById(@PathVariable Integer id) {
         namingservice.deleteNodeById(id);
-        logger.info("Node removed from Server, ip = "+ id);
+        logger.info("Node removed from Server, ID = "+ id);
         return ResponseEntity.ok("Node removed successfully");
     }
 
