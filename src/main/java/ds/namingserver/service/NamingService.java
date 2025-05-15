@@ -128,8 +128,11 @@ public class NamingService {
      * @param nodeId ip of the node that will be removed
      */
     public void deleteNodeById(int nodeId) {
-        if(map.remove(nodeId) == null)
+        if (map.containsKey(nodeId)) {
+            map.remove(nodeId);
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The node you are trying to remove does not exist");
+        }
     }
 
 

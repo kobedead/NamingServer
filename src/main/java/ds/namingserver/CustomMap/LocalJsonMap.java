@@ -50,7 +50,7 @@ public class LocalJsonMap<K extends Comparable<K>, V> extends TreeMap<K, V> {
         try {
             // Write updated data back to the file
             objectMapper.writeValue(file, this); // 'this' is now a sorted TreeMap
-            System.out.println("Sorted map updated and saved to map.json successfully!");
+            System.out.println("Sorted map updated and saved to map.json successfully! Map size is now " + size());
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error writing to JSON", e);
         }
