@@ -203,7 +203,13 @@ public class NamingService {
      * @return id of node where the file belongs
      */
     public String getNodeFromFileName(String filename){
-        return map.getPreviousWithWrap(Utilities.mapHash(filename));
+        int hashOfFile = Utilities.mapHash(filename);
+
+        if (map.containsKey(hashOfFile))
+            return map.get(hashOfFile);
+        else
+            return map.getPreviousWithWrap(Utilities.mapHash(filename));
+
     }
 
 
