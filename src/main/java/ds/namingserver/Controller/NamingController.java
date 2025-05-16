@@ -2,6 +2,7 @@ package ds.namingserver.Controller;
 
 import ds.namingserver.Model.AddNodeDTO;
 import ds.namingserver.service.NamingService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -101,8 +102,9 @@ public class NamingController {
      * @return the file
      */
     @GetMapping("/node/by-filename/{filename}")
-    public ResponseEntity getIpOfNodeFromFile(@PathVariable("filename") String filename) {
-        String IPofNode = namingservice.getNodeFromFileName(filename);
+    public ResponseEntity getIpOfNodeFromFile(@PathVariable("filename") String filename, HttpServletRequest request) {
+        System.out.println("getIpOfNodeFromFile for filename : " + filename + " requested by " + request.getRemoteAddr());
+        String IPofNode = namingservice.getNodeFromFileName(filename, request.getRemoteAddr());
         ResponseEntity<String> ip = new ResponseEntity<>(IPofNode , HttpStatus.OK);
 
         return ip;
@@ -117,10 +119,11 @@ public class NamingController {
      * @return the file
      */
     @GetMapping("/file/{filename}")
-    public ResponseEntity downloadFile(@PathVariable("filename") String filename) throws IOException {
+    public ResponseEntity downloadFile(@PathVariable("filename") String filename, HttpServletRequest request) throws IOException {
+        System.out.println("downloadFile for filename : " + filename + " requested by " + request.getRemoteAddr());
 
         // Get file instance from the service
-        ResponseEntity<Resource> resource= namingservice.getFile(filename);
+        ResponseEntity<Resource> resource= namingservice.getFile(filename, request.getRemoteAddr());
         return resource;
 
     }
@@ -133,8 +136,9 @@ public class NamingController {
      * @return the file
      */
     @PostMapping("/file")
-    public ResponseEntity uploadFile(@RequestBody MultipartFile file ) throws IOException {
-        return namingservice.sendFile(file);
+    public ResponseEntity uploadFile(@RequestBody MultipartFile file, HttpServletRequest request) throws IOException {
+        System.out.println("uploadFile for filename : " + file.getOriginalFilename() + " requested by " + request.getRemoteAddr());
+        return namingservice.sendFile(file, request.getRemoteAddr());
     }
 
 

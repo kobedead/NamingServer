@@ -144,9 +144,9 @@ public class NamingService {
      * @param filename the file to search for
      * @return ResponseEntity with file in
      */
-    public ResponseEntity<Resource> getFile(String filename)  {
+    public ResponseEntity<Resource> getFile(String filename, String ipOfRequester)  {
 
-        String ip = getNodeFromFileName(filename);
+        String ip = getNodeFromFileName(filename, ipOfRequester);
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file/"+filename;
 
@@ -167,10 +167,10 @@ public class NamingService {
      * @param file file to send to node
      * @return ResponseEntity with status of the received (responses)
      */
-    public ResponseEntity<String> sendFile(MultipartFile file)  {
+    public ResponseEntity<String> sendFile(MultipartFile file, String ipOfRequester)  {
 
 
-        String ip = getNodeFromFileName(file.getOriginalFilename());
+        String ip = getNodeFromFileName(file.getOriginalFilename(), ipOfRequester);
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file";
 
@@ -205,13 +205,13 @@ public class NamingService {
      * @param filename filename to find node for
      * @return id of node where the file belongs
      */
-    public String getNodeFromFileName(String filename){
+    public String getNodeFromFileName(String filename, String ipOfRequester) {
         int hashOfFile = Utilities.mapHash(filename);
 
         if (map.containsKey(hashOfFile))
             return map.get(hashOfFile);
         else
-            return map.getPreviousWithWrap(Utilities.mapHash(filename));
+            return map.getPreviousWithWrapExcludingValue(Utilities.mapHash(filename), ipOfRequester);
 
     }
 
