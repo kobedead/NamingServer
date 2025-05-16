@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -102,14 +103,19 @@ public class LocalJsonMap<K extends Comparable<K>, V> extends TreeMap<K, V> {
     }
 
     public V getPreviousWithWrap(K key) {
+        System.out.println("getPreviousWithWrap called");
         K previousKey = this.lowerKey(key);
         if (previousKey != null) {
+            System.out.println("lowerKey returned: " + previousKey);
             return this.get(previousKey);
         } else {
             // Wrap around to the last (largest) key
+            System.out.println("Wrap around performed");
             if (!isEmpty()) {
+                System.out.println("Last key: " + this.lastKey() + " is returned: " + this.get(this.lastKey()));
                 return this.get(this.lastKey());
             } else {
+                System.out.println("List is empty");
                 return null; // Or throw an exception if the map is empty
             }
         }
