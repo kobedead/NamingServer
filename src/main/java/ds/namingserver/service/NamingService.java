@@ -146,7 +146,7 @@ public class NamingService {
      */
     public ResponseEntity<Resource> getFile(String filename, String ipOfRequester)  {
 
-        String ip = getNodeFromFileName(filename, ipOfRequester);
+        String ip = getNodeFromFileName(filename);
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file/"+filename;
 
@@ -170,7 +170,7 @@ public class NamingService {
     public ResponseEntity<String> sendFile(MultipartFile file, String ipOfRequester)  {
 
 
-        String ip = getNodeFromFileName(file.getOriginalFilename(), ipOfRequester);
+        String ip = getNodeFromFileName(file.getOriginalFilename());
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file";
 
@@ -205,13 +205,13 @@ public class NamingService {
      * @param filename filename to find node for
      * @return id of node where the file belongs
      */
-    public String getNodeFromFileName(String filename, String ipOfRequester) {
+    public String getNodeFromFileName(String filename) {
         int hashOfFile = Utilities.mapHash(filename);
 
         if (map.containsKey(hashOfFile))
             return map.get(hashOfFile);
         else
-            return map.getPreviousWithWrapExcludingValue(Utilities.mapHash(filename), ipOfRequester);
+            return map.getPreviousWithWrap(Utilities.mapHash(filename));
 
     }
 

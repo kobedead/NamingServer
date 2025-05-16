@@ -117,37 +117,6 @@ public class LocalJsonMap<K extends Comparable<K>, V> extends TreeMap<K, V> {
         }
     }
 
-    public V getPreviousWithWrapExcludingValue(K key, V excludedValue) {
-        if (isEmpty()) {
-            System.out.println("Map is empty");
-            return null;
-        }
-
-        K currentKey = this.lowerKey(key);
-
-        // Loop until we find a value that is not excluded, or we loop back
-        while (currentKey != null) {
-            V value = this.get(currentKey);
-            if (!value.equals(excludedValue)) {
-                return value;
-            }
-            currentKey = this.lowerKey(currentKey);
-        }
-
-        // Wrap around to the end if needed
-        currentKey = this.lastKey();
-        while (currentKey != null && currentKey.compareTo(key) > 0) {
-            V value = this.get(currentKey);
-            if (!value.equals(excludedValue)) {
-                return value;
-            }
-            currentKey = this.lowerKey(currentKey);
-        }
-
-        return null; // If everything is excluded
-    }
-
-
 
     public K getNextKeyWithWrap(K key) {
         K nextKey = this.higherKey(key);

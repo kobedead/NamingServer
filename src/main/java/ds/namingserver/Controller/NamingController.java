@@ -102,9 +102,8 @@ public class NamingController {
      * @return the file
      */
     @GetMapping("/node/by-filename/{filename}")
-    public ResponseEntity getIpOfNodeFromFile(@PathVariable("filename") String filename, HttpServletRequest request) {
-        System.out.println("getIpOfNodeFromFile for filename : " + filename + " requested by " + request.getRemoteAddr());
-        String IPofNode = namingservice.getNodeFromFileName(filename, request.getRemoteAddr());
+    public ResponseEntity getIpOfNodeFromFile(@PathVariable("filename") String filename) {
+        String IPofNode = namingservice.getNodeFromFileName(filename);
         ResponseEntity<String> ip = new ResponseEntity<>(IPofNode , HttpStatus.OK);
 
         return ip;
