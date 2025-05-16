@@ -108,7 +108,6 @@ public class LocalJsonMap<K extends Comparable<K>, V> extends TreeMap<K, V> {
             return this.get(previousKey);
         } else {
             // Wrap around to the last (largest) key
-            System.out.println("Wrap around performed");
             if (!isEmpty()) {
                 return this.get(this.lastKey());
             } else {
