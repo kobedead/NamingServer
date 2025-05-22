@@ -305,7 +305,7 @@ public class NamingService {
         if (!map.isEmpty()) {
             return map.size();
         } else {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "NamingServer map size is empty");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "NamingServer map size is empty");
         }
 
     }
