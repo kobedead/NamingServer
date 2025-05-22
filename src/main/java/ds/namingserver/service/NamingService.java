@@ -300,4 +300,13 @@ public class NamingService {
         return nextAndPrevMap;
 
     }
+
+    public int getNumberOfNodes() {
+        if (!map.isEmpty()) {
+            return map.size();
+        } else {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "NamingServer map size is empty");
+        }
+
+    }
 }

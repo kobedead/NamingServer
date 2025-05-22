@@ -86,11 +86,20 @@ public class NamingController {
     }
 
 
-
     @GetMapping("/node/nextAndPrevious/{id}")
     public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable Integer id) {
         Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(id);
         return new ResponseEntity<>(nextAndPreviousMap, HttpStatus.OK);
+    }
+
+    /**
+     * Fetches the amount of nodes that are currently known
+     * to the NamingServer in its LocalJSONMap
+     * @return integer numberOfNodes
+     */
+    @GetMapping("/node/count")
+    public ResponseEntity<Integer> getNumberOfNodes() {
+        return new ResponseEntity<>(namingservice.getNumberOfNodes(), HttpStatus.OK);
     }
 
 
@@ -139,6 +148,8 @@ public class NamingController {
         System.out.println("uploadFile for filename : " + file.getOriginalFilename() + " requested by " + request.getRemoteAddr());
         return namingservice.sendFile(file, request.getRemoteAddr());
     }
+
+
 
 
 
