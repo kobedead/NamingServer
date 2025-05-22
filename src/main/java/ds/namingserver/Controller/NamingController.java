@@ -97,6 +97,7 @@ public class NamingController {
      * to the NamingServer in its LocalJSONMap
      * @return integer numberOfNodes
      */
+    @CrossOrigin(origins = "*")
     @GetMapping("/node/count")
     public ResponseEntity<Integer> getNumberOfNodes() {
         return new ResponseEntity<>(namingservice.getNumberOfNodes(), HttpStatus.OK);
