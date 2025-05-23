@@ -207,7 +207,6 @@ public class NamingService {
      */
     public String getNodeFromFileName(String filename){
 
-        System.out.println("Node requested for Filename : " + filename + "node found : ");
 
 
         int hashOfFile = Utilities.mapHash(filename);
