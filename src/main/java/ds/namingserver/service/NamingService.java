@@ -206,13 +206,21 @@ public class NamingService {
      * @return id of node where the file belongs
      */
     public String getNodeFromFileName(String filename){
+
+        System.out.println("Node requested for Filename : " + filename + "node found : ");
+
+
         int hashOfFile = Utilities.mapHash(filename);
-
+        String ipOfFoundNode;
         if (map.containsKey(hashOfFile))
-            return map.get(hashOfFile);
+            ipOfFoundNode =   map.get(hashOfFile);
         else
-            return map.getPreviousWithWrap(Utilities.mapHash(filename));
+            ipOfFoundNode = map.getPreviousWithWrap(Utilities.mapHash(filename));
 
+        System.out.println("Node requested for Filename : " + filename + "node found : " + ipOfFoundNode);
+
+
+        return ipOfFoundNode;
     }
 
 
