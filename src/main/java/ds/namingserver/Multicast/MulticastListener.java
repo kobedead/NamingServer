@@ -35,7 +35,7 @@ public class MulticastListener  {
 
             SocketAddress sockaddr = new InetSocketAddress(group, NSConf.MULTICAST_PORT);
 
-
+            socket.setReuseAddress(true);
             // Join the multicast group
             socket.joinGroup(sockaddr ,null);           //check
 

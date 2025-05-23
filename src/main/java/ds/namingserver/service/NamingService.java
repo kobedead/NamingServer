@@ -250,7 +250,6 @@ public class NamingService {
         }
 
         System.out.println("number of nodes : " + numberOfNodes);
-        System.out.println("test");
 
         final String uri = "http://"+ requestingNodeIp +":"+ NSConf.NAMINGNODE_PORT +"/node/size";
 
@@ -273,7 +272,6 @@ public class NamingService {
         }
 
     }
-
     /**
      * Method getNextAndPrevious
      * Get the next and previous node from given node id (in map)
@@ -296,6 +294,10 @@ public class NamingService {
             nextAndPrevMap.put(nextKey, map.get(nextKey));
             nextAndPrevMap.put(previousKey, map.get(nextKey));
         }
+
+        System.out.println("Next and previous : " + nextAndPrevMap +  "   , asked of node : " + id);
+        System.out.println("Full map is : " + map.toString());
+
 
         return nextAndPrevMap;
 
