@@ -292,7 +292,7 @@ public class NamingService {
         }
         else {
             nextAndPrevMap.put(nextKey, map.get(nextKey));
-            nextAndPrevMap.put(previousKey, map.get(nextKey));
+            nextAndPrevMap.put(previousKey, map.get(previousKey));
         }
 
         System.out.println("Next and previous : " + nextAndPrevMap +  "   , asked of node : " + id);
