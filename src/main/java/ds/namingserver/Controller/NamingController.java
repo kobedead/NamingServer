@@ -151,26 +151,8 @@ public class NamingController {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @GetMapping("/node/map")
+    public ResponseEntity<Map<Integer, String>> getNodeMap() {
+        return ResponseEntity.ok(namingservice.getMap());
+    }
 }
