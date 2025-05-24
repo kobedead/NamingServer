@@ -237,7 +237,7 @@ public class NamingService {
             }
         }
 
-        System.out.println("Node requested for Filename : " + filename + "node found : " + ipOfFoundNode);
+        System.out.println("Node requested for Filename : " + filename + "     node found : " + ipOfFoundNode);
 
         return ipOfFoundNode;
     }
@@ -269,6 +269,7 @@ public class NamingService {
         //add node to map, if node already in map return -1
         if(map.containsKey(hashName)) {
             numberOfNodes = -1;
+            map.remove(hashName); //to be certain
             System.out.println("Node with hash already in map");
         }
         else {
