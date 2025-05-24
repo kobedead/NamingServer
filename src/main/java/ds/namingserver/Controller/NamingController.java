@@ -102,7 +102,23 @@ public class NamingController {
      */
     @GetMapping("/node/by-filename/{filename}")
     public ResponseEntity getIpOfNodeFromFile(@PathVariable("filename") String filename) {
-        String IPofNode = namingservice.getNodeFromFileName(filename);
+        String IPofNode = namingservice.getNodeFromFileName(filename , null);
+        ResponseEntity<String> ip = new ResponseEntity<>(IPofNode , HttpStatus.OK);
+
+        return ip;
+    }
+
+
+    /**
+     * Gets filename and sends ip back of node it belongs to
+     *
+     * @param filename file
+     * @param ownerIp ip of owner
+     * @return the file
+     */
+    @GetMapping("/node/by-filename")
+    public ResponseEntity getIpOfNodeFromFileWithOwner(@RequestParam String filename, @RequestParam String ownerIp) {
+        String IPofNode = namingservice.getNodeFromFileName(filename , ownerIp);
         ResponseEntity<String> ip = new ResponseEntity<>(IPofNode , HttpStatus.OK);
 
         return ip;

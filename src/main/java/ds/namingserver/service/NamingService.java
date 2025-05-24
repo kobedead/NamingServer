@@ -146,7 +146,7 @@ public class NamingService {
      */
     public ResponseEntity<Resource> getFile(String filename)  {
 
-        String ip = getNodeFromFileName(filename);
+        String ip = getNodeFromFileName(filename , null);
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file/"+filename;
 
@@ -170,7 +170,7 @@ public class NamingService {
     public ResponseEntity<String> sendFile(MultipartFile file)  {
 
 
-        String ip = getNodeFromFileName(file.getOriginalFilename());
+        String ip = getNodeFromFileName(file.getOriginalFilename() , null);
 
         final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file";
 
@@ -203,21 +203,38 @@ public class NamingService {
      * Follows the specs given in the exercise
      *
      * @param filename filename to find node for
+     * @param ipOfOwner ip of the owner of the file
      * @return id of node where the file belongs
      */
-    public String getNodeFromFileName(String filename){
-
-
-
+    public String getNodeFromFileName(String filename , String ipOfOwner){
         int hashOfFile = Utilities.mapHash(filename);
-        String ipOfFoundNode;
-        if (map.containsKey(hashOfFile))
-            ipOfFoundNode =   map.get(hashOfFile);
-        else
-            ipOfFoundNode = map.getPreviousWithWrap(Utilities.mapHash(filename));
+
+        String ipOfFoundNode = map.getPreviousWithWrap(hashOfFile);
+
+        if (ipOfFoundNode != null) {
+            //this is a bit slow but should do the trick -> future work is to convert everything to using Node classes
+            if (Objects.equals(ipOfFoundNode, ipOfOwner)) {
+                System.out.println("Found node (" + ipOfFoundNode + ") is the owner, finding previous for redundancy.");
+                Integer ownerKey = null;
+                // Find the key (node ID) associated with the owner's IP
+                for (Map.Entry<Integer, String> entry : map.entrySet()) {
+                    if (Objects.equals(entry.getValue(), ipOfOwner)) {
+                        ownerKey = entry.getKey();
+                        break;
+                    }
+                }
+
+                if (ownerKey != null) {
+                    ipOfFoundNode = (String) map.getPreviousWithWrap(ownerKey);
+                    System.out.println("Redundant node found: " + ipOfFoundNode);
+                } else {
+                    System.out.println("Could not find owner's key in the map for redundancy.");
+                    // Fallback to the initially found node (the owner) or handle differently
+                }
+            }
+        }
 
         System.out.println("Node requested for Filename : " + filename + "node found : " + ipOfFoundNode);
-
 
         return ipOfFoundNode;
     }
