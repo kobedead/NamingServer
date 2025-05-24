@@ -92,6 +92,7 @@ public class NamingController {
      */
     @GetMapping("/node/by-filename")
     public ResponseEntity getIpOfNodeFromFileWithOwner(@RequestParam String filename, @RequestParam String ownerIp) {
+        System.out.println("by-filename called with filename: " + filename + "  owner  : " + ownerIp);
         String IPofNode = namingservice.getNodeFromFileName(filename , ownerIp);
         ResponseEntity<String> ip = new ResponseEntity<>(IPofNode , HttpStatus.OK);
 
