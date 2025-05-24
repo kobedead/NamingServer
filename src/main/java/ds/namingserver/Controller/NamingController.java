@@ -44,32 +44,6 @@ public class NamingController {
     }
 
 
-    /**
-     * Add Node to server
-     *
-     * @param addNodeDTO DTO with name and ip of node
-     * @return the ResponseEntity with status 200 (OK)
-     */
-    @PostMapping("/node")
-    public ResponseEntity<String> addNode(@RequestBody AddNodeDTO addNodeDTO) {
-        namingservice.addNode(addNodeDTO.getName() , addNodeDTO.getIp());
-        logger.info("Node added to Server, Name = "+ addNodeDTO.getName() + "Ip = "+addNodeDTO.getIp() );
-        return ResponseEntity.ok("Node added to Server");
-    }
-
-    /**
-     * remove Node from server
-     *
-     * @param name name of Node
-     * @return the ResponseEntity with status 200 (OK)
-     */
-    @DeleteMapping("/node/by-name/{name}")
-    public ResponseEntity<String> removeNodeByName(@PathVariable String name) {
-        namingservice.deleteNodeByName(name);
-        logger.info("Node removed from Server, Name = "+ name);
-        return ResponseEntity.ok("Node removed successfully");
-    }
-
 
     /**
      * remove Node from server
