@@ -207,6 +207,9 @@ public class NamingService {
      * @return id of node where the file belongs
      */
     public String getNodeFromFileName(String filename , String ipOfOwner){
+
+
+
         int hashOfFile = Utilities.mapHash(filename);
 
         String ipOfFoundNode = map.getPreviousWithWrap(hashOfFile);
