@@ -119,7 +119,7 @@ public class NamingController {
      * @return the file
      */
     @GetMapping("/file/{filename}")
-    public ResponseEntity downloadFile(@PathVariable("filename") String filename, HttpServletRequest request) throws IOException {
+    public ResponseEntity downloadFile(@PathVariable("filename") String filename, HttpServletRequest request)  {
         System.out.println("downloadFile for filename : " + filename + " requested by " + request.getRemoteAddr());
 
         // Get file instance from the service
@@ -136,7 +136,7 @@ public class NamingController {
      * @return the file
      */
     @PostMapping("/file")
-    public ResponseEntity uploadFile(@RequestBody MultipartFile file, HttpServletRequest request) throws IOException {
+    public ResponseEntity uploadFile(@RequestBody MultipartFile file, HttpServletRequest request)  {
         System.out.println("uploadFile for filename : " + file.getOriginalFilename() + " requested by " + request.getRemoteAddr());
         return namingservice.sendFile(file, request.getRemoteAddr());
     }

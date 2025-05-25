@@ -142,13 +142,16 @@ public class NamingService {
      *
      *
      * @param filename the file to search for
+     * @param ipOfRequester the ip of the requester
      * @return ResponseEntity with file in
      */
-    public ResponseEntity<Resource> getFile(String filename)  {
+    public ResponseEntity<Resource> getFile(String filename, String ipOfRequester)  {
 
         String ip = getNodeFromFileName(filename , null);
 
-        final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+"/node/file/"+filename;
+        String mapping = "/node/file/with-requesterIP?filename=" + filename + "&requesterIP=" + ipOfRequester;
+
+        final String uri = "http://"+ip+":"+NSConf.NAMINGNODE_PORT+ mapping;
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -157,7 +160,7 @@ public class NamingService {
 
         //return result;
         return response;
-        }
+    }
 
 
     /**
@@ -165,10 +168,12 @@ public class NamingService {
      * Send a given file to the right node
      *
      * @param file file to send to node
+     * @param ipOfRequester ip of the requester
      * @return ResponseEntity with status of the received (responses)
      */
-    public ResponseEntity<String> sendFile(MultipartFile file)  {
+    public ResponseEntity<String> sendFile(MultipartFile file, String ipOfRequester)  {
 
+        //could do something with this ip -> check if legit...
 
         String ip = getNodeFromFileName(file.getOriginalFilename() , null);
 
@@ -195,7 +200,6 @@ public class NamingService {
         return response;
 
     }
-
 
     /**
      * Method getNodeFromFileName
