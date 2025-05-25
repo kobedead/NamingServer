@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -110,6 +111,7 @@ public class LocalJsonMap<K extends Comparable<K>, V> extends TreeMap<K, V> {
             if (!isEmpty()) {
                 return this.get(this.lastKey());
             } else {
+                System.out.println("List is empty");
                 return null; // Or throw an exception if the map is empty
             }
         }
