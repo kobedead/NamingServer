@@ -3,6 +3,7 @@ package ds.namingserver.service;
 import ds.namingserver.Config.NSConf;
 import ds.namingserver.CustomMap.LocalJsonMap;
 import ds.namingserver.Multicast.MulticastListener;
+import ds.namingserver.Utilities.NodeDTO;
 import ds.namingserver.Utilities.Utilities;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.Resource;
@@ -333,6 +334,26 @@ public class NamingService {
         return nextAndPrevMap;
 
     }
+
+
+    public NodeDTO getNext(int id ){
+        int nextKey = map.getNextKeyWithWrap(id);
+        return new NodeDTO(nextKey , map.get(nextKey));
+
+    }
+
+    public NodeDTO getPrevious(int id ){
+        int nextKey = map.getNextKeyWithWrap(id);
+        return new NodeDTO(nextKey , map.get(nextKey));
+
+    }
+
+
+
+
+
+
+
 
     public int getNumberOfNodes() {
         if (!map.isEmpty()) {
