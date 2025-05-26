@@ -2,14 +2,14 @@ package ds.namingserver.Utilities;
 
 import java.io.Serializable;
 
-public class NodeDTO {
+public class Node implements Serializable {
 
     private int ID;
 
     private String IP;
 
 
-    public NodeDTO(int ID, String IP) {
+    public Node(int ID, String IP) {
         this.ID = ID;
         this.IP = IP;
     }
@@ -18,7 +18,7 @@ public class NodeDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NodeDTO node = (NodeDTO) o;
+        Node node = (Node) o;
         return ID == node.ID; // Compare only the ID
     }
 
