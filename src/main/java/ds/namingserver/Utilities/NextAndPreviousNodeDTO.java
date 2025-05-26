@@ -1,27 +1,27 @@
 package ds.namingserver.Utilities;
 
 public class NextAndPreviousNodeDTO {
-    private Node nextNode;
-    private Node previousNode;
+    private NodeDTO nextNode;
+    private NodeDTO previousNode;
 
-    public NextAndPreviousNodeDTO(Node nextID, Node previousID) {
+    public NextAndPreviousNodeDTO(NodeDTO nextID, NodeDTO previousID) {
         this.nextNode = nextID;
         this.previousNode = previousID;
     }
 
-    public Node getNextID() {
+    public NodeDTO getNextID() {
         return nextNode;
     }
 
-    public void setNextID(Node nextID) {
+    public void setNextID(NodeDTO nextID) {
         this.nextNode = nextID;
     }
 
-    public Node getPreviousID() {
+    public NodeDTO getPreviousID() {
         return previousNode;
     }
 
-    public void setPreviousID(Node previousID) {
+    public void setPreviousID(NodeDTO previousID) {
         this.previousNode = previousID;
     }
 }
