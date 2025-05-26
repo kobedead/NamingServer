@@ -3,6 +3,8 @@ package ds.namingserver.service;
 import ds.namingserver.Config.NSConf;
 import ds.namingserver.CustomMap.LocalJsonMap;
 import ds.namingserver.Multicast.MulticastListener;
+import ds.namingserver.Utilities.NextAndPreviousNodeDTO;
+import ds.namingserver.Utilities.Node;
 import ds.namingserver.Utilities.Utilities;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.Resource;
@@ -311,27 +313,18 @@ public class NamingService {
      * @param id id of node to look for neighbors
      * @return next and previous node in map.
      */
-    public Map<Integer, String> getNextAndPrevious(Integer id) {
-
-        Map<Integer, String> nextAndPrevMap = new HashMap<>();
-
+    public NextAndPreviousNodeDTO getNextAndPreviousDTO(Integer id) {
         int nextKey = map.getNextKeyWithWrap(id);
         int previousKey = map.getPreviousKeyWithWrap(id);
 
-        if (nextKey == previousKey){
-            nextAndPrevMap.put(nextKey,map.get(nextKey));
-        }
-        else {
-            nextAndPrevMap.put(nextKey, map.get(nextKey));
-            nextAndPrevMap.put(previousKey, map.get(previousKey));
-        }
+        Node nextNode = new Node(nextKey , map.get(nextKey));
+        Node previousNode = new Node(previousKey , map.get(previousKey));
 
-        System.out.println("Next and previous : " + nextAndPrevMap +  "   , asked of node : " + id);
-        System.out.println("Full map is : " + map.toString());
+        NextAndPreviousNodeDTO dto = new NextAndPreviousNodeDTO(nextNode, previousNode);
 
+        System.out.println("Next and previous (DTO): Next=" + nextKey + ", Previous=" + previousKey + " , asked of node : " + id);
 
-        return nextAndPrevMap;
-
+        return dto;
     }
 
     public int getNumberOfNodes() {

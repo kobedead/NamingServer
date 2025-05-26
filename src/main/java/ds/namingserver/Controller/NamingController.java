@@ -1,6 +1,7 @@
 package ds.namingserver.Controller;
 
 import ds.namingserver.Model.AddNodeDTO;
+import ds.namingserver.Utilities.NextAndPreviousNodeDTO;
 import ds.namingserver.service.NamingService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +62,10 @@ public class NamingController {
 
 
     @GetMapping("/node/nextAndPrevious/{id}")
-    public ResponseEntity<Map<Integer, String>> getNextAndPrevious(@PathVariable Integer id) {
-        Map<Integer, String> nextAndPreviousMap = namingservice.getNextAndPrevious(id);
-        return new ResponseEntity<>(nextAndPreviousMap, HttpStatus.OK);
+    public ResponseEntity<NextAndPreviousNodeDTO> getNextAndPrevious(@PathVariable Integer id) {
+        NextAndPreviousNodeDTO dto = namingservice.getNextAndPreviousDTO(id);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
-
     /**
      * Fetches the amount of nodes that are currently known
      * to the NamingServer in its LocalJSONMap
