@@ -224,8 +224,7 @@ public class NamingService {
             if (Objects.equals(ipOfFoundNode, ipOfOwner)) {
                 System.out.println("Found node (" + ipOfFoundNode + ") is the owner, finding previous for redundancy.");
                 Integer ownerKey = null;
-
-                // Find the key (node ID) associated with the owner's IP -> bad part
+                // Find the key (node ID) associated with the owner's IP
                 for (Map.Entry<Integer, String> entry : map.entrySet()) {
                     if (Objects.equals(entry.getValue(), ipOfOwner)) {
                         ownerKey = entry.getKey();
@@ -234,7 +233,7 @@ public class NamingService {
                 }
 
                 if (ownerKey != null) {
-                    ipOfFoundNode = map.getPreviousWithWrap(ownerKey);
+                    ipOfFoundNode = (String) map.getPreviousWithWrap(ownerKey);
                     System.out.println("Redundant node found: " + ipOfFoundNode);
                 } else {
                     System.out.println("Could not find owner's key in the map for redundancy.");
@@ -339,16 +338,13 @@ public class NamingService {
 
     public NodeDTO getNext(int id ){
         int nextKey = map.getNextKeyWithWrap(id);
-        System.out.println("Next from the map is asked from : " + id + " Supplied next : " + nextKey );
-
         return new NodeDTO(nextKey , map.get(nextKey));
 
     }
 
     public NodeDTO getPrevious(int id ){
-        int previousKey = map.getPreviousKeyWithWrap(id);
-        System.out.println("Previous from the map is asked from : " + id + " Supplied next : " + previousKey );
-        return new NodeDTO(previousKey , map.get(previousKey));
+        int nextKey = map.getNextKeyWithWrap(id);
+        return new NodeDTO(nextKey , map.get(nextKey));
 
     }
 
